@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/baduk-io/weiqi.js/issues"
   },
-  "homepage": "https://github.com/baduk-io/weiqi.js"
+  "homepage": "https://github.com/baduk-io/weiqi.js",
+  "dependencies": {
+    "lodash": "~2.4.1"
+  }
 }
