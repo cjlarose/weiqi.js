@@ -1,12 +1,12 @@
 var _ = require('lodash');
 
 var Board = function(size) {
-  this.current_color = Board.BLACK;
+  this.currentColor = Board.BLACK;
   this.size = size;
   this.board = this.createBoard(size);
-  this.last_move_passed = false;
-  this.in_atari = false;
-  this.attempted_suicide = false;
+  this.lastMovePassed = false;
+  this.inAtari = false;
+  this.attemptedSuicide = false;
 };
 
 /*
@@ -35,17 +35,17 @@ _.extend(Board.prototype, {
    * Switches the current player
    */
   switchPlayer: function() {
-    this.current_color = 
-      this.current_color == Board.BLACK ? Board.WHITE : Board.BLACK;
+    this.currentColor =
+      this.currentColor == Board.BLACK ? Board.WHITE : Board.BLACK;
   },
 
   /*
    * At any point in the game, a player can pass and let his opponent play
    */
   pass: function() {
-    if (this.last_move_passed)
+    if (this.lastMovePassed)
       this.endGame();
-    this.last_move_passed = true;
+    this.lastMovePassed = true;
     this.switchPlayer();
   },
 
@@ -60,13 +60,13 @@ _.extend(Board.prototype, {
    * Attempt to place a stone at (i,j). Returns true iff the move was legal
    */
   play: function(i, j) {
-    console.log("Played at " + i + ", " + j);   
-    this.attempted_suicide = this.in_atari = false;
+    console.log("Played at " + i + ", " + j);
+    this.attemptedSuicide = this.inAtari = false;
 
     if (this.board[i][j] != Board.EMPTY)
       return false;
 
-    var color = this.board[i][j] = this.current_color;
+    var color = this.board[i][j] = this.currentColor;
     var captured = [];
     var neighbors = this.getAdjacentIntersections(i, j);
     var atari = false;
@@ -87,7 +87,7 @@ _.extend(Board.prototype, {
     // detect suicide
     if (_.isEmpty(captured) && this.getGroup(i, j)["liberties"] == 0) {
       this.board[i][j] = Board.EMPTY;
-      this.attempted_suicide = true;
+      this.attemptedSuicide = true;
       return false;
     }
 
@@ -99,9 +99,9 @@ _.extend(Board.prototype, {
     });
 
     if (atari)
-      this.in_atari = true;
+      this.inAtari = true;
 
-    this.last_move_passed = false;
+    this.lastMovePassed = false;
     this.switchPlayer();
     return true;
   },
@@ -111,7 +111,7 @@ _.extend(Board.prototype, {
    * orthagonally adjacent intersections
    */
   getAdjacentIntersections: function(i , j) {
-    var neighbors = []; 
+    var neighbors = [];
     if (i > 0)
       neighbors.push([i - 1, j]);
     if (j < this.size - 1)
