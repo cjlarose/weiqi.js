@@ -28,5 +28,9 @@
   "homepage": "https://github.com/baduk-io/weiqi.js",
   "dependencies": {
     "lodash": "~2.4.1"
+  },
+  "devDependencies": {
+    "mocha": "~2.0.1",
+    "chai": "~1.10.0"
   }
 }
