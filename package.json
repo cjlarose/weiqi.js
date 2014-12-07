@@ -1,0 +1,29 @@
+{
+  "name": "weiqi",
+  "version": "0.0.0",
+  "description": "An implementation of the ancient Chinese board board Go (Chinese: wéiqí, Korean: baduk, Japanese: igo)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baduk-io/weiqi.js.git"
+  },
+  "keywords": [
+    "baduk",
+    "go",
+    "weiqi",
+    "board",
+    "game"
+  ],
+  "author": "Chris LaRose <cjlarose@gmail.com> (http://cjlarose.com/)",
+  "license": {
+    "type": "ISC",
+    "url": "https://github.com/baduk-io/weiqi.js/blob/master/LICENSE-ISC.txt"
+  },
+  "bugs": {
+    "url": "https://github.com/baduk-io/weiqi.js/issues"
+  },
+  "homepage": "https://github.com/baduk-io/weiqi.js"
+}
