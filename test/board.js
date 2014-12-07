@@ -17,17 +17,23 @@ describe('#createBoard', function() {
     var board = Board.createBoard(19);
     board.size.should.equal(19);
   });
+
+  it('should start off empty', function() {
+    var board = Board.createBoard(9);
+    var i, j;
+    for (i = 0; i < 9; i++)
+      for (j = 0; j < 9; j++)
+        board.getStone(i, j).should.equal(Board.EMPTY);
+  });
 });
 
 describe('#inBounds', function() {
   it('should accept inner bounds', function() {
     var board = Board.createBoard(9);
     var i, j;
-    for (i = 0; i < 9; i++) {
-      for (j = 0; j < 9; j++) {
+    for (i = 0; i < 9; i++)
+      for (j = 0; j < 9; j++)
         board.inBounds(i, j).should.equal(true);
-      }
-    }
   });
 
   it('should reject negative coords', function() {
