@@ -68,12 +68,12 @@ describe('#play', function() {
   });
 
   it('should set the correct stone color', function() {
-    Board.createBoard(9)
+    Board.createBoard(4)
       .play(Board.BLACK, 0, 0)
-      .getStone(0, 0).should.equal(Board.BLACK);
+      .toString().should.equal("x...\n....\n....\n....");
 
-    Board.createBoard(9)
-      .play(Board.WHITE, 4, 2)
-      .getStone(4, 2).should.equal(Board.WHITE);
+    Board.createBoard(4)
+      .play(Board.WHITE, 3, 2)
+      .toString().should.equal("....\n....\n....\n..o.");
   });
 });
