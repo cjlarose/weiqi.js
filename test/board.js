@@ -34,7 +34,7 @@ describe("Board", function() {
       var i, j;
       for (i = 0; i < 9; i++)
         for (j = 0; j < 9; j++)
-          board.inBounds(i, j).should.equal(true);
+          board.inBounds([i, j]).should.equal(true);
     });
 
     it('should reject negative coords', function() {
