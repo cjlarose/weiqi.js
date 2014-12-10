@@ -41,16 +41,16 @@ describe("Game", function() {
       game.pass(Board.WHITE);
       game.isOver().should.equal(true);
 
-      var fn = function() {game.play(Board.BLACK);};
+      var fn = function() {game.play(Board.BLACK, [0, 0]);};
       expect(fn).to.throw("Game is already over");
     });
 
     it('forbids play of same player twice', function() {
       var game = Game.createGame(9);
-      game.play(Board.BLACK, 0, 0);
+      game.play(Board.BLACK, [0, 0]);
       game.getCurrentPlayer().should.equal(Board.WHITE);
 
-      var fn = function() {game.play(Board.BLACK, 0, 0);};
+      var fn = function() {game.play(Board.BLACK, [0, 0]);};
       expect(fn).to.throw("Not player's turn");
     });
   });

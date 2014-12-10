@@ -54,7 +54,7 @@ describe("Board", function() {
   describe('#play', function() {
     it('should reject out of bounds coords', function() {
       var fn = function() {
-        return Board.createBoard(9).play(Board.BLACK, -1, -1);
+        return Board.createBoard(9).play(Board.BLACK, [-1, -1]);
       };
       expect(fn).to.throw("Intersection out of bounds");
     });
@@ -62,95 +62,95 @@ describe("Board", function() {
     it('should reject occupied intersections', function() {
       var fn = function() {
         Board.createBoard(9)
-          .play(Board.BLACK, 0, 0)
-          .play(Board.WHITE, 0, 0);
+          .play(Board.BLACK, [0, 0])
+          .play(Board.WHITE, [0, 0]);
       };
       expect(fn).to.throw("Intersection occupied by existing stone");
     });
 
     it('should set the correct stone color', function() {
       Board.createBoard(4)
-        .play(Board.BLACK, 0, 0)
+        .play(Board.BLACK, [0, 0])
         .toString().should.equal("x...\n....\n....\n....");
 
       Board.createBoard(4)
-        .play(Board.WHITE, 3, 2)
+        .play(Board.WHITE, [3, 2])
         .toString().should.equal("....\n....\n....\n..o.");
     });
 
     it('should capture stones in the corner', function() {
       var board = Board.createBoard(4)
-                    .play(Board.BLACK, 0, 0)
-                    .play(Board.BLACK, 0, 1)
-                    .play(Board.BLACK, 1, 0);
+                    .play(Board.BLACK, [0, 0])
+                    .play(Board.BLACK, [0, 1])
+                    .play(Board.BLACK, [1, 0]);
 
       board.toString().should.equal("xx..\nx...\n....\n....");
 
       board
-        .play(Board.WHITE, 0, 2)
-        .play(Board.WHITE, 1, 1);
+        .play(Board.WHITE, [0, 2])
+        .play(Board.WHITE, [1, 1]);
 
       board.toString().should.equal("xxo.\nxo..\n....\n....");
 
       board
-        .play(Board.WHITE, 2, 0);
+        .play(Board.WHITE, [2, 0]);
 
       board.toString().should.equal("..o.\n.o..\no...\n....");
     });
 
     it('should capture stones on the side', function() {
       var board = Board.createBoard(4)
-                    .play(Board.BLACK, 1, 3)
-                    .play(Board.BLACK, 1, 2);
+                    .play(Board.BLACK, [1, 3])
+                    .play(Board.BLACK, [1, 2]);
 
       board.toString().should.equal("....\n..xx\n....\n....");
 
       board
-        .play(Board.WHITE, 1, 1)
-        .play(Board.WHITE, 0, 3)
-        .play(Board.WHITE, 0, 2)
-        .play(Board.WHITE, 2, 3);
+        .play(Board.WHITE, [1, 1])
+        .play(Board.WHITE, [0, 3])
+        .play(Board.WHITE, [0, 2])
+        .play(Board.WHITE, [2, 3]);
 
       board.toString().should.equal("..oo\n.oxx\n...o\n....");
 
       board
-        .play(Board.WHITE, 2, 2);
+        .play(Board.WHITE, [2, 2]);
 
       board.toString().should.equal("..oo\n.o..\n..oo\n....");
     });
 
     it('should capture stones in the middle', function() {
       var board = Board.createBoard(4)
-                    .play(Board.BLACK, 1, 1)
-                    .play(Board.BLACK, 1, 2);
+                    .play(Board.BLACK, [1, 1])
+                    .play(Board.BLACK, [1, 2]);
 
       board.toString().should.equal("....\n.xx.\n....\n....");
 
       board
-        .play(Board.WHITE, 0, 2)
-        .play(Board.WHITE, 1, 0)
-        .play(Board.WHITE, 1, 3)
-        .play(Board.WHITE, 2, 1)
-        .play(Board.WHITE, 2, 2);
+        .play(Board.WHITE, [0, 2])
+        .play(Board.WHITE, [1, 0])
+        .play(Board.WHITE, [1, 3])
+        .play(Board.WHITE, [2, 1])
+        .play(Board.WHITE, [2, 2]);
 
       board.toString().should.equal("..o.\noxxo\n.oo.\n....");
 
       board
-        .play(Board.WHITE, 0, 1);
+        .play(Board.WHITE, [0, 1]);
 
       board.toString().should.equal(".oo.\no..o\n.oo.\n....");
     });
 
     it('should allow suicide of one stone', function() {
       var board = Board.createBoard(4)
-                    .play(Board.BLACK, 0, 1)
-                    .play(Board.BLACK, 1, 2)
-                    .play(Board.BLACK, 2, 1)
-                    .play(Board.BLACK, 1, 0);
+                    .play(Board.BLACK, [0, 1])
+                    .play(Board.BLACK, [1, 2])
+                    .play(Board.BLACK, [2, 1])
+                    .play(Board.BLACK, [1, 0]);
 
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
 
-      board.play(Board.WHITE, 1, 1);
+      board.play(Board.WHITE, [1, 1]);
 
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
     });
