@@ -155,5 +155,25 @@ describe("Board", function() {
 
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
     });
+
+    it('should allow suicide of many stones', function() {
+      var board = Board.createBoard(4)
+                    .play(Weiqi.BLACK, [0, 1])
+                    .play(Weiqi.BLACK, [0, 2])
+                    .play(Weiqi.BLACK, [1, 3])
+                    .play(Weiqi.BLACK, [2, 2])
+                    .play(Weiqi.BLACK, [2, 1])
+                    .play(Weiqi.BLACK, [1, 0]);
+
+      board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
+
+      board.play(Weiqi.WHITE, [1, 1]);
+
+      board.toString().should.equal(".xx.\nxo.x\n.xx.\n....");
+
+      board.play(Weiqi.WHITE, [1, 2]);
+
+      board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
+    });
   });
 });
