@@ -92,10 +92,7 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [1, 1]);
 
       board.toString().should.equal("xxo.\nxo..\n....\n....");
-
-      board
-        .play(Weiqi.WHITE, [2, 0]);
-
+      board.play(Weiqi.WHITE, [2, 0]);
       board.toString().should.equal("..o.\n.o..\no...\n....");
     });
 
@@ -113,10 +110,7 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [2, 3]);
 
       board.toString().should.equal("..oo\n.oxx\n...o\n....");
-
-      board
-        .play(Weiqi.WHITE, [2, 2]);
-
+      board.play(Weiqi.WHITE, [2, 2]);
       board.toString().should.equal("..oo\n.o..\n..oo\n....");
     });
 
@@ -135,10 +129,7 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [2, 2]);
 
       board.toString().should.equal("..o.\noxxo\n.oo.\n....");
-
-      board
-        .play(Weiqi.WHITE, [0, 1]);
-
+      board.play(Weiqi.WHITE, [0, 1]);
       board.toString().should.equal(".oo.\no..o\n.oo.\n....");
     });
 
@@ -150,9 +141,7 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [1, 0]);
 
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
-
       board.play(Weiqi.WHITE, [1, 1]);
-
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
     });
 
@@ -166,14 +155,24 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [1, 0]);
 
       board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
-
       board.play(Weiqi.WHITE, [1, 1]);
-
       board.toString().should.equal(".xx.\nxo.x\n.xx.\n....");
-
       board.play(Weiqi.WHITE, [1, 2]);
-
       board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
+    });
+
+    it('should evaluate enemy liberties before player liberties', function() {
+      var board = Board.createBoard(4)
+                    .play(Weiqi.BLACK, [0, 1])
+                    .play(Weiqi.WHITE, [0, 2])
+                    .play(Weiqi.BLACK, [1, 2])
+                    .play(Weiqi.WHITE, [1, 3])
+                    .play(Weiqi.BLACK, [2, 1])
+                    .play(Weiqi.WHITE, [2, 2])
+                    .play(Weiqi.BLACK, [1, 0]);
+      board.toString().should.equal(".xo.\nx.xo\n.xo.\n....");
+      board.play(Weiqi.WHITE, [1, 1]);
+      board.toString().should.equal(".xo.\nxo.o\n.xo.\n....");
     });
   });
 });
