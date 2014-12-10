@@ -140,5 +140,19 @@ describe("Board", function() {
 
       board.toString().should.equal(".oo.\no..o\n.oo.\n....");
     });
+
+    it('should allow suicide of one stone', function() {
+      var board = Board.createBoard(4)
+                    .play(Board.BLACK, 0, 1)
+                    .play(Board.BLACK, 1, 2)
+                    .play(Board.BLACK, 2, 1)
+                    .play(Board.BLACK, 1, 0);
+
+      board.toString().should.equal(".x..\nx.x.\n.x..\n....");
+
+      board.play(Board.WHITE, 1, 1);
+
+      board.toString().should.equal(".x..\nx.x.\n.x..\n....");
+    });
   });
 });
