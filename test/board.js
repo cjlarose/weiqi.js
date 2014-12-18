@@ -7,17 +7,17 @@ describe("Board", function() {
   describe('#createBoard', function() {
     it('creates a board of size 9', function() {
       var board = Board.createBoard(9);
-      board.size.should.equal(9);
+      board.getSize().should.equal(9);
     });
 
     it('creates a board of size 13', function() {
       var board = Board.createBoard(13);
-      board.size.should.equal(13);
+      board.getSize().should.equal(13);
     });
 
     it('creates a board of size 19', function() {
       var board = Board.createBoard(19);
-      board.size.should.equal(19);
+      board.getSize().should.equal(19);
     });
 
     it('should start off empty', function() {
