@@ -32,10 +32,12 @@ describe("Board", function() {
   describe('#play', function() {
     it('should allow inner coords', function() {
       var i, j, board;
+      var board = Board.createBoard(9);
       for (i = 0; i < 9; i++)
         for (j = 0; j < 9; j++) {
-          board = Board.createBoard(9).play(Weiqi.BLACK, [i, j]);
-          board.getStone([i, j]).should.equal(Weiqi.BLACK);
+          board
+            .play(Weiqi.BLACK, [i, j])
+           .getStone([i, j]).should.equal(Weiqi.BLACK);
         }
     });
 
@@ -76,12 +78,12 @@ describe("Board", function() {
 
       board.toString().should.equal("xx..\nx...\n....\n....");
 
-      board
+      board = board
         .play(Weiqi.WHITE, [0, 2])
         .play(Weiqi.WHITE, [1, 1]);
 
       board.toString().should.equal("xxo.\nxo..\n....\n....");
-      board.play(Weiqi.WHITE, [2, 0]);
+      board = board.play(Weiqi.WHITE, [2, 0]);
       board.toString().should.equal("..o.\n.o..\no...\n....");
     });
 
@@ -92,14 +94,14 @@ describe("Board", function() {
 
       board.toString().should.equal("....\n..xx\n....\n....");
 
-      board
+      board = board
         .play(Weiqi.WHITE, [1, 1])
         .play(Weiqi.WHITE, [0, 3])
         .play(Weiqi.WHITE, [0, 2])
         .play(Weiqi.WHITE, [2, 3]);
 
       board.toString().should.equal("..oo\n.oxx\n...o\n....");
-      board.play(Weiqi.WHITE, [2, 2]);
+      board = board.play(Weiqi.WHITE, [2, 2]);
       board.toString().should.equal("..oo\n.o..\n..oo\n....");
     });
 
@@ -110,7 +112,7 @@ describe("Board", function() {
 
       board.toString().should.equal("....\n.xx.\n....\n....");
 
-      board
+      board = board
         .play(Weiqi.WHITE, [0, 2])
         .play(Weiqi.WHITE, [1, 0])
         .play(Weiqi.WHITE, [1, 3])
@@ -118,7 +120,7 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [2, 2]);
 
       board.toString().should.equal("..o.\noxxo\n.oo.\n....");
-      board.play(Weiqi.WHITE, [0, 1]);
+      board = board.play(Weiqi.WHITE, [0, 1]);
       board.toString().should.equal(".oo.\no..o\n.oo.\n....");
     });
 
@@ -130,7 +132,7 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [1, 0]);
 
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
-      board.play(Weiqi.WHITE, [1, 1]);
+      board = board.play(Weiqi.WHITE, [1, 1]);
       board.toString().should.equal(".x..\nx.x.\n.x..\n....");
     });
 
@@ -144,9 +146,9 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [1, 0]);
 
       board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
-      board.play(Weiqi.WHITE, [1, 1]);
+      board = board.play(Weiqi.WHITE, [1, 1]);
       board.toString().should.equal(".xx.\nxo.x\n.xx.\n....");
-      board.play(Weiqi.WHITE, [1, 2]);
+      board = board.play(Weiqi.WHITE, [1, 2]);
       board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
     });
 
@@ -160,7 +162,7 @@ describe("Board", function() {
                     .play(Weiqi.WHITE, [2, 2])
                     .play(Weiqi.BLACK, [1, 0]);
       board.toString().should.equal(".xo.\nx.xo\n.xo.\n....");
-      board.play(Weiqi.WHITE, [1, 1]);
+      board = board.play(Weiqi.WHITE, [1, 1]);
       board.toString().should.equal(".xo.\nxo.o\n.xo.\n....");
     });
   });
