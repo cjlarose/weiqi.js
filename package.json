@@ -1,6 +1,6 @@
 {
   "name": "weiqi",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An implementation of the ancient Chinese board board Go (Chinese: wéiqí, Korean: baduk, Japanese: igo)",
   "main": "index.js",
   "scripts": {
