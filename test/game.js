@@ -67,5 +67,57 @@ describe("Game", function() {
       var fn = function() {game.play(Weiqi.BLACK, [1, 2]);};
       expect(fn).to.throw("Violation of Ko");
     });
+
+    it('forbids complex ko', function() {
+      // Example from http://senseis.xmp.net/?Superko
+      // setup
+      var game = Game.createGame(5)
+                   .play(Weiqi.BLACK, [0, 3])
+                   .play(Weiqi.WHITE, [0, 4])
+
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [1, 0])
+                   .play(Weiqi.BLACK, [1, 1])
+                   .pass(Weiqi.WHITE)
+                   .play(Weiqi.BLACK, [1, 2])
+                   .pass(Weiqi.WHITE)
+                   .play(Weiqi.BLACK, [1, 3])
+                   .play(Weiqi.WHITE, [1, 4])
+
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [2, 0])
+                   .play(Weiqi.BLACK, [2, 2])
+                   .play(Weiqi.WHITE, [2, 3])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [2, 4])
+
+                   .play(Weiqi.BLACK, [3, 0])
+                   .pass(Weiqi.WHITE)
+                   .play(Weiqi.BLACK, [3, 1])
+                   .pass(Weiqi.WHITE)
+                   .play(Weiqi.BLACK, [3, 2])
+                   .play(Weiqi.WHITE, [3, 4])
+
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [4, 0])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [4, 1])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [4, 2])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [4, 3]);
+
+      // white plays, putting board into valid state
+      // black captures
+      game = game.pass(Weiqi.BLACK)
+               .play(Weiqi.WHITE, [0, 1])
+               .pass(Weiqi.BLACK)
+               .play(Weiqi.WHITE, [0, 2])
+               .play(Weiqi.BLACK, [0, 0]);
+
+      // white cannot retake
+      var fn = function() {game.play(Weiqi.WHITE, [0, 1]);};
+      expect(fn).to.throw("Violation of Ko");
+    });
   });
 });
