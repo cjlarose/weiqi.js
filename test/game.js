@@ -14,10 +14,12 @@ describe("Game", function() {
 
   describe('#pass', function() {
     it('ends the game with two consectutive passes', function() {
-      var game = Game.createGame(9);
-      game.pass(Weiqi.BLACK);
+      var game = Game.createGame(9)
+        .pass(Weiqi.BLACK);
+
       game.getCurrentPlayer().should.equal(Weiqi.WHITE);
-      game.pass(Weiqi.WHITE);
+
+      game = game.pass(Weiqi.WHITE);
       game.isOver().should.equal(true);
 
       var fn = function() {game.pass(Weiqi.BLACK);};
@@ -25,8 +27,7 @@ describe("Game", function() {
     });
 
     it('forbids play of same player twice', function() {
-      var game = Game.createGame(9);
-      game.pass(Weiqi.BLACK);
+      var game = Game.createGame(9).pass(Weiqi.BLACK);
       game.getCurrentPlayer().should.equal(Weiqi.WHITE);
 
       var fn = function() {game.pass(Weiqi.BLACK);};
@@ -36,9 +37,9 @@ describe("Game", function() {
 
   describe("#play", function() {
     it('forbids play on completed game', function() {
-      var game = Game.createGame(9);
-      game.pass(Weiqi.BLACK);
-      game.pass(Weiqi.WHITE);
+      var game = Game.createGame(9)
+        .pass(Weiqi.BLACK)
+        .pass(Weiqi.WHITE);
       game.isOver().should.equal(true);
 
       var fn = function() {game.play(Weiqi.BLACK, [0, 0]);};
@@ -46,8 +47,8 @@ describe("Game", function() {
     });
 
     it('forbids play of same player twice', function() {
-      var game = Game.createGame(9);
-      game.play(Weiqi.BLACK, [0, 0]);
+      var game = Game.createGame(9)
+        .play(Weiqi.BLACK, [0, 0]);
       game.getCurrentPlayer().should.equal(Weiqi.WHITE);
 
       var fn = function() {game.play(Weiqi.BLACK, [0, 0]);};
