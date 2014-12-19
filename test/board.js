@@ -3,6 +3,15 @@ var expect = require('chai').expect;
 var Weiqi = require('../index.js');
 var Board = Weiqi.Board;
 
+// shorthand for testing whole board
+Object.prototype.looksLike = function(rows) {
+  var expected = [];
+  rows.forEach(function(str) {
+    expected.push(str.split(''));
+  });
+  return this.toArray().should.deep.equal(expected);
+};
+
 describe("Board", function() {
   describe('#createBoard', function() {
     it('creates a board of size 9', function() {
@@ -63,11 +72,11 @@ describe("Board", function() {
     it('should set the correct stone color', function() {
       Board.createBoard(4)
         .play(Weiqi.BLACK, [0, 0])
-        .toString().should.equal("x...\n....\n....\n....");
+        .looksLike(['x...', '....', '....', '....']);
 
       Board.createBoard(4)
         .play(Weiqi.WHITE, [3, 2])
-        .toString().should.equal("....\n....\n....\n..o.");
+        .looksLike(['....', '....', '....', '..o.']);
     });
 
     it('should capture stones in the corner', function() {
@@ -76,15 +85,16 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.BLACK, [1, 0]);
 
-      board.toString().should.equal("xx..\nx...\n....\n....");
+      board.looksLike(['xx..', 'x...', '....', '....']);
 
       board = board
         .play(Weiqi.WHITE, [0, 2])
         .play(Weiqi.WHITE, [1, 1]);
 
-      board.toString().should.equal("xxo.\nxo..\n....\n....");
+      board.looksLike(['xxo.', 'xo..', '....', '....']);
+
       board = board.play(Weiqi.WHITE, [2, 0]);
-      board.toString().should.equal("..o.\n.o..\no...\n....");
+      board.looksLike(['..o.', '.o..', 'o...', '....']);
     });
 
     it('should capture stones on the side', function() {
@@ -92,7 +102,7 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [1, 3])
                     .play(Weiqi.BLACK, [1, 2]);
 
-      board.toString().should.equal("....\n..xx\n....\n....");
+      board.looksLike(['....', '..xx', '....', '....']);
 
       board = board
         .play(Weiqi.WHITE, [1, 1])
@@ -100,9 +110,9 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [0, 2])
         .play(Weiqi.WHITE, [2, 3]);
 
-      board.toString().should.equal("..oo\n.oxx\n...o\n....");
+      board.looksLike(['..oo', '.oxx', '...o', '....']);
       board = board.play(Weiqi.WHITE, [2, 2]);
-      board.toString().should.equal("..oo\n.o..\n..oo\n....");
+      board.looksLike(['..oo', '.o..', '..oo', '....']);
     });
 
     it('should capture stones in the middle', function() {
@@ -110,7 +120,7 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [1, 1])
                     .play(Weiqi.BLACK, [1, 2]);
 
-      board.toString().should.equal("....\n.xx.\n....\n....");
+      board.looksLike(['....', '.xx.', '....', '....']);
 
       board = board
         .play(Weiqi.WHITE, [0, 2])
@@ -119,9 +129,9 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [2, 1])
         .play(Weiqi.WHITE, [2, 2]);
 
-      board.toString().should.equal("..o.\noxxo\n.oo.\n....");
+      board.looksLike(['..o.', 'oxxo', '.oo.', '....']);
       board = board.play(Weiqi.WHITE, [0, 1]);
-      board.toString().should.equal(".oo.\no..o\n.oo.\n....");
+      board.looksLike(['.oo.', 'o..o', '.oo.', '....']);
     });
 
     it('should allow suicide of one stone', function() {
@@ -131,9 +141,9 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [2, 1])
                     .play(Weiqi.BLACK, [1, 0]);
 
-      board.toString().should.equal(".x..\nx.x.\n.x..\n....");
+      board.looksLike(['.x..', 'x.x.', '.x..', '....']);
       board = board.play(Weiqi.WHITE, [1, 1]);
-      board.toString().should.equal(".x..\nx.x.\n.x..\n....");
+      board.looksLike(['.x..', 'x.x.', '.x..', '....']);
     });
 
     it('should allow suicide of many stones', function() {
@@ -145,11 +155,11 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [2, 1])
                     .play(Weiqi.BLACK, [1, 0]);
 
-      board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
+      board.looksLike(['.xx.', 'x..x', '.xx.', '....']);
       board = board.play(Weiqi.WHITE, [1, 1]);
-      board.toString().should.equal(".xx.\nxo.x\n.xx.\n....");
+      board.looksLike(['.xx.', 'xo.x', '.xx.', '....']);
       board = board.play(Weiqi.WHITE, [1, 2]);
-      board.toString().should.equal(".xx.\nx..x\n.xx.\n....");
+      board.looksLike(['.xx.', 'x..x', '.xx.', '....']);
     });
 
     it('should evaluate enemy liberties before player liberties', function() {
@@ -161,9 +171,9 @@ describe("Board", function() {
                     .play(Weiqi.BLACK, [2, 1])
                     .play(Weiqi.WHITE, [2, 2])
                     .play(Weiqi.BLACK, [1, 0]);
-      board.toString().should.equal(".xo.\nx.xo\n.xo.\n....");
+      board.looksLike(['.xo.', 'x.xo', '.xo.', '....']);
       board = board.play(Weiqi.WHITE, [1, 1]);
-      board.toString().should.equal(".xo.\nxo.o\n.xo.\n....");
+      board.looksLike(['.xo.', 'xo.o', '.xo.', '....']);
     });
   });
 });
