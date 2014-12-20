@@ -176,4 +176,67 @@ describe("Board", function() {
       board.looksLike(['.xo.', 'xo.o', '.xo.', '....']);
     });
   });
+
+  describe('#areaScore', function() {
+    it('should not award points for empty board', function() {
+      var board = Board.createBoard(4);
+      board.looksLike(['....', '....', '....', '....']);
+      var score = board.areaScore();
+      score[Weiqi.BLACK].should.equal(0);
+      score[Weiqi.WHITE].should.equal(0);
+    });
+
+    it('should award points for board with single stone', function() {
+      var board = Board.createBoard(4)
+                    .play(Weiqi.BLACK, [0, 0]);
+      board.looksLike(['x...', '....', '....', '....']);
+      var score = board.areaScore();
+      score[Weiqi.BLACK].should.equal(16);
+      score[Weiqi.WHITE].should.equal(0);
+    });
+
+    it('should not award points for sparse board', function() {
+      var board = Board.createBoard(4)
+                    .play(Weiqi.BLACK, [1, 1])
+                    .play(Weiqi.WHITE, [2, 2]);
+      board.looksLike(['....', '.x..', '..o.', '....']);
+      var score = board.areaScore();
+      score[Weiqi.BLACK].should.equal(1);
+      score[Weiqi.WHITE].should.equal(1);
+    });
+
+    it('should count stones and territory', function() {
+      var board = Board.createBoard(4)
+                    .play(Weiqi.BLACK, [0, 1])
+                    .play(Weiqi.BLACK, [1, 1])
+                    .play(Weiqi.BLACK, [2, 1])
+                    .play(Weiqi.BLACK, [3, 1])
+                    .play(Weiqi.WHITE, [0, 2])
+                    .play(Weiqi.WHITE, [1, 2])
+                    .play(Weiqi.WHITE, [2, 2])
+                    .play(Weiqi.WHITE, [3, 2]);
+      board.looksLike(['.xo.', '.xo.', '.xo.', '.xo.']);
+      var score = board.areaScore();
+      score[Weiqi.BLACK].should.equal(8);
+      score[Weiqi.WHITE].should.equal(8);
+    });
+
+    it('should consider all stones alive', function() {
+      var board = Board.createBoard(4)
+                    .play(Weiqi.BLACK, [0, 1])
+                    .play(Weiqi.BLACK, [1, 1])
+                    .play(Weiqi.BLACK, [2, 1])
+                    .play(Weiqi.BLACK, [3, 1])
+                    .play(Weiqi.WHITE, [0, 2])
+                    .play(Weiqi.WHITE, [1, 2])
+                    .play(Weiqi.WHITE, [2, 2])
+                    .play(Weiqi.WHITE, [3, 2])
+                    .play(Weiqi.BLACK, [2, 3])
+                    .play(Weiqi.BLACK, [3, 3]);
+      board.looksLike(['.xo.', '.xo.', '.xox', '.xox']);
+      var score = board.areaScore();
+      score[Weiqi.BLACK].should.equal(10);
+      score[Weiqi.WHITE].should.equal(4);
+    });
+  });
 });
