@@ -1,7 +1,6 @@
 var should = require('chai').should();
 var expect = require('chai').expect;
 var Weiqi = require('../index.js');
-var Board = Weiqi.Board;
 
 // shorthand for testing whole board
 Object.prototype.looksLike = function(rows) {
@@ -15,22 +14,22 @@ Object.prototype.looksLike = function(rows) {
 describe("Board", function() {
   describe('#createBoard', function() {
     it('creates a board of size 9', function() {
-      var board = Board.createBoard(9);
+      var board = Weiqi.createBoard(9);
       board.getSize().should.equal(9);
     });
 
     it('creates a board of size 13', function() {
-      var board = Board.createBoard(13);
+      var board = Weiqi.createBoard(13);
       board.getSize().should.equal(13);
     });
 
     it('creates a board of size 19', function() {
-      var board = Board.createBoard(19);
+      var board = Weiqi.createBoard(19);
       board.getSize().should.equal(19);
     });
 
     it('should start off empty', function() {
-      var board = Board.createBoard(9);
+      var board = Weiqi.createBoard(9);
       var i, j;
       for (i = 0; i < 9; i++)
         for (j = 0; j < 9; j++)
@@ -41,7 +40,7 @@ describe("Board", function() {
   describe('#play', function() {
     it('should allow inner coords', function() {
       var i, j, board;
-      var board = Board.createBoard(9);
+      var board = Weiqi.createBoard(9);
       for (i = 0; i < 9; i++)
         for (j = 0; j < 9; j++) {
           board
@@ -54,7 +53,7 @@ describe("Board", function() {
       var positions = [[-1, 0], [0, -1], [-1, -1], [9, 0], [0, 9], [9, 9]];
       positions.forEach(function(position) {
         var fn = function() {
-          return Board.createBoard(9).play(Weiqi.BLACK, positions);
+          return Weiqi.createBoard(9).play(Weiqi.BLACK, positions);
         };
         expect(fn).to.throw("Intersection out of bounds");
       });
@@ -62,7 +61,7 @@ describe("Board", function() {
 
     it('should reject occupied intersections', function() {
       var fn = function() {
-        Board.createBoard(9)
+        Weiqi.createBoard(9)
           .play(Weiqi.BLACK, [0, 0])
           .play(Weiqi.WHITE, [0, 0]);
       };
@@ -70,17 +69,17 @@ describe("Board", function() {
     });
 
     it('should set the correct stone color', function() {
-      Board.createBoard(4)
+      Weiqi.createBoard(4)
         .play(Weiqi.BLACK, [0, 0])
         .looksLike(['x...', '....', '....', '....']);
 
-      Board.createBoard(4)
+      Weiqi.createBoard(4)
         .play(Weiqi.WHITE, [3, 2])
         .looksLike(['....', '....', '....', '..o.']);
     });
 
     it('should capture stones in the corner', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 0])
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.BLACK, [1, 0]);
@@ -98,7 +97,7 @@ describe("Board", function() {
     });
 
     it('should capture stones on the side', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [1, 3])
                     .play(Weiqi.BLACK, [1, 2]);
 
@@ -116,7 +115,7 @@ describe("Board", function() {
     });
 
     it('should capture stones in the middle', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [1, 1])
                     .play(Weiqi.BLACK, [1, 2]);
 
@@ -135,7 +134,7 @@ describe("Board", function() {
     });
 
     it('should allow suicide of one stone', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.BLACK, [1, 2])
                     .play(Weiqi.BLACK, [2, 1])
@@ -147,7 +146,7 @@ describe("Board", function() {
     });
 
     it('should allow suicide of many stones', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.BLACK, [0, 2])
                     .play(Weiqi.BLACK, [1, 3])
@@ -163,7 +162,7 @@ describe("Board", function() {
     });
 
     it('should evaluate enemy liberties before player liberties', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.WHITE, [0, 2])
                     .play(Weiqi.BLACK, [1, 2])
@@ -179,7 +178,7 @@ describe("Board", function() {
 
   describe('#areaScore', function() {
     it('should not award points for empty board', function() {
-      var board = Board.createBoard(4);
+      var board = Weiqi.createBoard(4);
       board.looksLike(['....', '....', '....', '....']);
       var score = board.areaScore();
       score[Weiqi.BLACK].should.equal(0);
@@ -187,7 +186,7 @@ describe("Board", function() {
     });
 
     it('should award points for board with single stone', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 0]);
       board.looksLike(['x...', '....', '....', '....']);
       var score = board.areaScore();
@@ -196,7 +195,7 @@ describe("Board", function() {
     });
 
     it('should not award points for sparse board', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [1, 1])
                     .play(Weiqi.WHITE, [2, 2]);
       board.looksLike(['....', '.x..', '..o.', '....']);
@@ -206,7 +205,7 @@ describe("Board", function() {
     });
 
     it('should count stones and territory', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.BLACK, [1, 1])
                     .play(Weiqi.BLACK, [2, 1])
@@ -222,7 +221,7 @@ describe("Board", function() {
     });
 
     it('should consider all stones alive', function() {
-      var board = Board.createBoard(4)
+      var board = Weiqi.createBoard(4)
                     .play(Weiqi.BLACK, [0, 1])
                     .play(Weiqi.BLACK, [1, 1])
                     .play(Weiqi.BLACK, [2, 1])

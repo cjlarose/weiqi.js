@@ -1,10 +1,10 @@
-var Game = require('./lib/game');
-var Board = require('./lib/board');
+var createGame = require('./lib/game').createGame;
+var createBoard = require('./lib/board').createBoard;
 var Constants = require('./lib/constants');
 
 module.exports = {
-  Game: Game,
-  Board: Board,
+  createGame: createGame,
+  createBoard: createBoard,
   EMPTY: Constants.EMPTY,
   BLACK: Constants.BLACK,
   WHITE: Constants.WHITE

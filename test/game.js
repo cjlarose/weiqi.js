@@ -1,12 +1,11 @@
 var should = require('chai').should();
 var expect = require('chai').expect;
 var Weiqi = require('../index.js');
-var Game = Weiqi.Game;
 
 describe("Game", function() {
   describe('#createGame', function() {
     it('started with black player', function() {
-      var game = Game.createGame(9);
+      var game = Weiqi.createGame(9);
       game.getCurrentPlayer().should.equal(Weiqi.BLACK);
       game.isOver().should.equal(false);
     });
@@ -14,7 +13,7 @@ describe("Game", function() {
 
   describe('#pass', function() {
     it('ends the game with two consectutive passes', function() {
-      var game = Game.createGame(9)
+      var game = Weiqi.createGame(9)
         .pass(Weiqi.BLACK);
 
       game.getCurrentPlayer().should.equal(Weiqi.WHITE);
@@ -27,7 +26,7 @@ describe("Game", function() {
     });
 
     it('forbids play of same player twice', function() {
-      var game = Game.createGame(9).pass(Weiqi.BLACK);
+      var game = Weiqi.createGame(9).pass(Weiqi.BLACK);
       game.getCurrentPlayer().should.equal(Weiqi.WHITE);
 
       var fn = function() {game.pass(Weiqi.BLACK);};
@@ -37,7 +36,7 @@ describe("Game", function() {
 
   describe("#play", function() {
     it('forbids play on completed game', function() {
-      var game = Game.createGame(9)
+      var game = Weiqi.createGame(9)
         .pass(Weiqi.BLACK)
         .pass(Weiqi.WHITE);
       game.isOver().should.equal(true);
@@ -47,7 +46,7 @@ describe("Game", function() {
     });
 
     it('forbids play of same player twice', function() {
-      var game = Game.createGame(9)
+      var game = Weiqi.createGame(9)
         .play(Weiqi.BLACK, [0, 0]);
       game.getCurrentPlayer().should.equal(Weiqi.WHITE);
 
@@ -56,7 +55,7 @@ describe("Game", function() {
     });
 
     it('forbids simple ko', function() {
-      var game = Game.createGame(4)
+      var game = Weiqi.createGame(4)
                    .play(Weiqi.BLACK, [0, 1])
                    .play(Weiqi.WHITE, [0, 2])
                    .play(Weiqi.BLACK, [1, 2])
@@ -72,7 +71,7 @@ describe("Game", function() {
     it('forbids complex ko', function() {
       // Example from http://senseis.xmp.net/?Superko
       // setup
-      var game = Game.createGame(4)
+      var game = Weiqi.createGame(4)
                    .play(Weiqi.BLACK, [0, 3])
                    .play(Weiqi.WHITE, [1, 0])
                    .play(Weiqi.BLACK, [1, 1])
@@ -96,7 +95,7 @@ describe("Game", function() {
 
   describe('#areaSore', function() {
     it('returns the difference between black and white\'s scores', function() {
-      var game = Game.createGame(4)
+      var game = Weiqi.createGame(4)
                    .play(Weiqi.BLACK, [0, 1])
                    .play(Weiqi.WHITE, [0, 2])
                    .play(Weiqi.BLACK, [1, 0])
@@ -109,7 +108,7 @@ describe("Game", function() {
     });
 
     it('adds komi to white\'s score', function() {
-      var game = Game.createGame(4)
+      var game = Weiqi.createGame(4)
                    .play(Weiqi.BLACK, [0, 1])
                    .play(Weiqi.WHITE, [0, 2])
                    .play(Weiqi.BLACK, [1, 0])
