@@ -35,6 +35,16 @@ describe("Board", function() {
         for (j = 0; j < 9; j++)
           board.getStone([i, j]).should.equal(Weiqi.EMPTY);
     });
+
+    it('requires a size', function() {
+      var fn = function() { Weiqi.createBoard(); };
+      expect(fn).to.throw("Size must be an integer greater than zero");
+    });
+
+    it('rejects negative size', function() {
+      var fn = function() { Weiqi.createBoard(-9); };
+      expect(fn).to.throw("Size must be an integer greater than zero");
+    });
   });
 
   describe('#play', function() {
