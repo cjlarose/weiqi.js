@@ -93,4 +93,32 @@ describe("Game", function() {
       expect(fn).to.throw("Violation of Ko");
     });
   });
+
+  describe('#areaSore', function() {
+    it('returns the difference between black and white\'s scores', function() {
+      var game = Game.createGame(4)
+                   .play(Weiqi.BLACK, [0, 1])
+                   .play(Weiqi.WHITE, [0, 2])
+                   .play(Weiqi.BLACK, [1, 0])
+                   .play(Weiqi.WHITE, [1, 2])
+                   .play(Weiqi.BLACK, [1, 1])
+                   .play(Weiqi.WHITE, [2, 0])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [2, 1]);
+      game.areaScore(0).should.equal(4 - 12);
+    });
+
+    it('adds komi to white\'s score', function() {
+      var game = Game.createGame(4)
+                   .play(Weiqi.BLACK, [0, 1])
+                   .play(Weiqi.WHITE, [0, 2])
+                   .play(Weiqi.BLACK, [1, 0])
+                   .play(Weiqi.WHITE, [1, 2])
+                   .play(Weiqi.BLACK, [1, 1])
+                   .play(Weiqi.WHITE, [2, 0])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [2, 1]);
+      game.areaScore(0.5).should.equal(4 - (12 + 0.5));
+    });
+  });
 });
