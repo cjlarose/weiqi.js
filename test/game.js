@@ -107,6 +107,19 @@ describe("Game", function() {
       game.areaScore(0).should.equal(4 - 12);
     });
 
+    it('defaults to komi of 0', function() {
+      var game = Weiqi.createGame(4)
+                   .play(Weiqi.BLACK, [0, 1])
+                   .play(Weiqi.WHITE, [0, 2])
+                   .play(Weiqi.BLACK, [1, 0])
+                   .play(Weiqi.WHITE, [1, 2])
+                   .play(Weiqi.BLACK, [1, 1])
+                   .play(Weiqi.WHITE, [2, 0])
+                   .pass(Weiqi.BLACK)
+                   .play(Weiqi.WHITE, [2, 1]);
+      game.areaScore().should.equal(4 - 12);
+    });
+
     it('adds komi to white\'s score', function() {
       var game = Weiqi.createGame(4)
                    .play(Weiqi.BLACK, [0, 1])
