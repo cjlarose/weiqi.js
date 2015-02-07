@@ -1,16 +1,21 @@
-# Weiqi.js
+# weiqi.js
 
-Weiqi.js is an implementation of the board game [Go][1]. It provides mechanisms for representing a board with black and white stones, as well as the logic to actually play a game. The objects used in `weiqi.js` are [persistent][2]--methods often return entirely new instances instead of mutating internal state.
+`weiqi.js` is an implementation of the board game [Go][1]. It provides
+mechanisms for representing a board with black and white stones, as well as the
+logic to actually play a game. The objects used in `weiqi.js` are
+[persistent][2]--methods often return entirely new instances instead of
+mutating internal state.
 
 [1]: http://en.wikipedia.org/wiki/Go_%28game%29
 [2]: http://en.wikipedia.org/wiki/Persistent_data_structure
 
-The library is available as an [`npm` package][3], and can be used in the browser with tools like [browserify][4].
+The library is available as an [`npm` package][3], and can be used in the
+browser with tools like [browserify][4].
 
 [3]: https://www.npmjs.com/package/weiqi
 [4]: http://browserify.org/
 
-# Playing a game
+## Playing a game
 
 ```javascript
 var Weiqi = require('weiqi');
@@ -21,7 +26,9 @@ game = game.pass(Weiqi.BLACK);        // black passes
 game = game.pass(Weiqi.WHITE);        // white passes
 ```
 
-`Game` handle captures appropriately. It forbids the same player playing twice. It enforces [positional superko][5]--at the end of any turn, the board cannot be in a state in which it has been previously.
+`Game` handle captures appropriately. It forbids the same player playing twice.
+It enforces [positional superko][5]--at the end of any turn, the board cannot
+be in a state in which it has been previously.
 
 [5]: http://senseis.xmp.net/?Superko
 
