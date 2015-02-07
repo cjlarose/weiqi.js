@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/baduk-io/weiqi.js",
   "dependencies": {
+    "mocha-lcov-reporter": "0.0.1",
     "mori": "~0.2.9"
   },
   "devDependencies": {
