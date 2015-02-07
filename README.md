@@ -19,11 +19,11 @@ browser with tools like [browserify][4].
 
 ```javascript
 var Weiqi = require('weiqi');
-var game = Weiqi.createGame(9);       // creates a game with a 9 x 9 board
-game = game.play(Weiqi.BLACK, [2,2]); // positions are 0-indexed. Black plays at the 3-3 point.
-game = game.play(Weiqi.WHITE, [6,6]); // white plays at the 7-7 corner.
-game = game.pass(Weiqi.BLACK);        // black passes
-game = game.pass(Weiqi.WHITE);        // white passes
+var game = Weiqi.createGame(9);            // creates a game with a 9 x 9 board
+                .play(Weiqi.BLACK, [2,2]); // positions are 0-indexed. Black plays at the 3-3 point.
+                .play(Weiqi.WHITE, [6,6]); // white plays at the 7-7 corner.
+                .pass(Weiqi.BLACK);        // black passes
+                .pass(Weiqi.WHITE);        // white passes
 ```
 
 `Game` handle captures appropriately. It forbids the same player playing twice.
