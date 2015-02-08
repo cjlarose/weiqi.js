@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/baduk-io/weiqi.js",
   "dependencies": {
-    "mori": "~0.2.9"
+    "mori": "~0.3.2"
   },
   "devDependencies": {
     "mocha": "~2.0.1",
