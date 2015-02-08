@@ -200,8 +200,8 @@ describe("Board", function() {
         .play(Weiqi.WHITE, [6, 6])
         .play(Weiqi.WHITE, [7, 6]);
 
-      board.getStones(Weiqi.BLACK).should.deep.equal([[2, 2], [2, 3]]);
-      board.getStones(Weiqi.WHITE).should.deep.equal([[6, 6], [7, 6]]);
+      board.getStones(Weiqi.BLACK).should.deep.have.members([[2, 2], [2, 3]]);
+      board.getStones(Weiqi.WHITE).should.deep.have.members([[7, 6], [6, 6]]);
     });
   });
 
