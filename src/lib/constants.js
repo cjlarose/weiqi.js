@@ -1,7 +1,7 @@
 /*
  * Constants for intersection states
  */
-module.exports = {
+export default {
   EMPTY: ".",
   BLACK: "x",
   WHITE: "o"

@@ -1,5 +1,5 @@
-var mori = require('mori');
-var Constants = require('./constants');
+import mori from 'mori';
+import Constants from './constants';
 
 function inBounds(size, coords) {
   var i = mori.nth(coords, 0), j = mori.nth(coords, 1);
@@ -83,7 +83,7 @@ function getGroup(stones, size, coords) {
                       'surrounding', surrounding);
 }
 
-function createBoard(size, stones) {
+export function createBoard(size, stones) {
   if (typeof size === "undefined" || size < 0)
     throw "Size must be an integer greater than zero";
 
@@ -195,9 +195,4 @@ function createBoard(size, stones) {
   };
 
   return Object.create(Board);
-};
-
-
-module.exports = {
-  createBoard: createBoard
 };

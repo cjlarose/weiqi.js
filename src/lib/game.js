@@ -1,8 +1,8 @@
-var mori = require('mori');
-var Board = require('./board');
-var Constants = require('./constants');
+import mori from 'mori';
+import { createBoard } from './board';
+import Constants from './constants';
 
-function createGame(boardSize, values) {
+export function createGame(boardSize, values) {
   var currentColor, consectutivePasses, history, board;
 
   if (typeof values !== "undefined") {
@@ -13,7 +13,7 @@ function createGame(boardSize, values) {
   } else {
     currentColor = Constants.BLACK;
     consectutivePasses = 0;
-    board = Board.createBoard(boardSize);
+    board = createBoard(boardSize);
     history = mori.set(board.getIntersections());
   }
 
@@ -87,8 +87,3 @@ function createGame(boardSize, values) {
 
   return Object.create(Game);
 }
-
-
-module.exports = {
-  createGame: createGame
-};
