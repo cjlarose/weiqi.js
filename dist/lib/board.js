@@ -56,24 +56,46 @@ function allPositions(size) {
  */
 function getGroup(stones, size, coords) {
   var color = getStone(stones, coords);
-  var visited = mori.set();
-  var queue = mori.queue(coords);
-  var surrounding = mori.hashMap();
 
-  while (!mori.isEmpty(queue)) {
-    var stone = mori.peek(queue);
-    queue = mori.pop(queue);
+  function search(visited, queue, surrounding) {
+    var _arguments = arguments,
+        _this = this,
+        _shouldContinue,
+        _result;
+    do {
+      _shouldContinue = false;
+      _result = (function (visited, queue, surrounding) {
+        if (mori.isEmpty(queue)) return { visited: visited, surrounding: surrounding };
 
-    if (mori.hasKey(visited, stone)) continue;
+        var stone = mori.peek(queue);
+        queue = mori.pop(queue);
 
-    var neighbors = getAdjacentIntersections(size, stone);
-    mori.each(neighbors, function (n) {
-      var state = getStone(stones, n);
-      if (state == color) queue = mori.conj(queue, n);else surrounding = mori.assoc(surrounding, n, state);
-    });
+        if (mori.hasKey(visited, stone)) {
+          _arguments = [visited, queue, surrounding];
+          _this = undefined;
+          return _shouldContinue = true;
+        }
 
-    visited = mori.conj(visited, stone);
+        var neighbors = getAdjacentIntersections(size, stone);
+        mori.each(neighbors, function (n) {
+          var state = getStone(stones, n);
+          if (state == color) queue = mori.conj(queue, n);else surrounding = mori.assoc(surrounding, n, state);
+        });
+
+        visited = mori.conj(visited, stone);
+        _arguments = [visited, queue, surrounding];
+        _this = undefined;
+        return _shouldContinue = true;
+      }).apply(_this, _arguments);
+    } while (_shouldContinue);
+    return _result;
   }
+
+  var _search = search(mori.set(), mori.queue(coords), mori.hashMap());
+
+  var visited = _search.visited;
+  var surrounding = _search.surrounding;
+
 
   var liberties = mori.filter(function (pair) {
     return mori.nth(pair, 1) == Constants.EMPTY;

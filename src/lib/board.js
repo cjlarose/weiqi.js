@@ -51,16 +51,16 @@ function allPositions(size) {
  */
 function getGroup(stones, size, coords) {
   var color = getStone(stones, coords);
-  var visited = mori.set();
-  var queue = mori.queue(coords);
-  var surrounding = mori.hashMap();
 
-  while (!mori.isEmpty(queue)) {
+  function search(visited, queue, surrounding) {
+    if (mori.isEmpty(queue))
+      return {visited: visited, surrounding: surrounding};
+
     var stone = mori.peek(queue);
     queue = mori.pop(queue);
 
     if (mori.hasKey(visited, stone))
-      continue;
+      return search(visited, queue, surrounding);
 
     var neighbors = getAdjacentIntersections(size, stone);
     mori.each(neighbors, function(n) {
@@ -72,7 +72,10 @@ function getGroup(stones, size, coords) {
     });
 
     visited = mori.conj(visited, stone);
+    return search(visited, queue, surrounding);
   }
+
+  var {visited, surrounding} = search(mori.set(), mori.queue(coords), mori.hashMap());
 
   var liberties = mori.filter(function(pair) {
     return mori.nth(pair, 1) == Constants.EMPTY;
