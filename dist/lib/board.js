@@ -30,11 +30,9 @@ var deltas = mori.vector(mori.vector(-1, 0), mori.vector(0, 1), mori.vector(1, 0
 function getAdjacentIntersections(size, coords) {
   var i = mori.nth(coords, 0),
       j = mori.nth(coords, 1);
-
   var addPair = function (vec) {
     return mori.vector(mori.nth(vec, 0) + i, mori.nth(vec, 1) + j);
   };
-
   return mori.filter(mori.partial(inBounds, size), mori.map(addPair, deltas));
 }
 
@@ -141,8 +139,6 @@ function createBoard(size, stones) {
      * Attempt to place a stone at (i,j).
      */
     play: function (color, coords) {
-      var i = coords[0],
-          j = coords[1];
       coords = mori.toClj(coords);
 
       if (!inBounds(size, coords)) throw "Intersection out of bounds";
@@ -162,16 +158,20 @@ function createBoard(size, stones) {
 
       // detect suicide
       var newGroup = getGroup(newBoard, size, coords);
-      if (mori.isEmpty(captured) && mori.get(newGroup, "liberties") === 0) {
+      if (mori.isEmpty(captured) && isDead(newGroup)) {
         captured = mori.vector(newGroup);
       }
+
+      var replaceStones = function (board, value, coords) {
+        return mori.reduce(function (acc, stone) {
+          return replaceStone(acc, stone, value);
+        }, board, coords);
+      };
 
       // remove captured stones
       newBoard = mori.pipeline(captured, mori.partial(mori.mapcat, function (g) {
         return mori.get(g, "stones");
-      }), mori.partial(mori.reduce, function (board, stone) {
-        return replaceStone(board, stone, Constants.EMPTY);
-      }, newBoard));
+      }), mori.partial(replaceStones, newBoard, Constants.EMPTY));
 
       return createBoard(size, newBoard);
     },

@@ -25,20 +25,13 @@ var deltas = mori.vector(mori.vector(-1, 0),
  */
 function getAdjacentIntersections(size, coords) {
   var i = mori.nth(coords, 0), j = mori.nth(coords, 1);
-
-  var addPair = function(vec) {
-    return mori.vector(mori.nth(vec, 0) + i, mori.nth(vec, 1) + j);
-  };
-
+  var addPair = vec => mori.vector(mori.nth(vec, 0) + i, mori.nth(vec, 1) + j);
   return mori.filter(mori.partial(inBounds, size), mori.map(addPair, deltas));
 }
 
 function allPositions(size) {
-  return mori.mapcat(function(i) {
-    return mori.map(function(j) {
-      return mori.vector(i, j);
-    }, mori.range(size));
-  }, mori.range(size));
+  return mori.mapcat(i => mori.map(j => mori.vector(i, j), mori.range(size)),
+                     mori.range(size));
 }
 
 /*
@@ -77,9 +70,8 @@ function getGroup(stones, size, coords) {
 
   var {visited, surrounding} = search(mori.set(), mori.queue(coords), mori.hashMap());
 
-  var liberties = mori.filter(function(pair) {
-    return mori.nth(pair, 1) == Constants.EMPTY;
-  }, surrounding);
+  var liberties = mori.filter(pair => mori.nth(pair, 1) == Constants.EMPTY,
+                              surrounding);
 
   return mori.hashMap('liberties',   mori.count(liberties),
                       'stones',      visited,
@@ -95,40 +87,28 @@ export function createBoard(size, stones) {
 
   var Board = {
 
-    getStone: function(coords) {
-      return getStone(stones, mori.toClj(coords));
-    },
+    getStone: coords => getStone(stones, mori.toClj(coords)),
 
     toArray: function() {
       return mori.toJs(this.getIntersections());
     },
 
-    getStones: function(color) {
-      return mori.pipeline(stones,
-                           mori.partial(mori.filter, function(pair) {
-                             return mori.nth(pair, 1) == color;
-                           }),
-                           mori.partial(mori.map, mori.first),
-                           mori.toJs);
-    },
+    getStones: color => mori.pipeline(stones,
+                          mori.partial(mori.filter,
+                                       pair => mori.nth(pair, 1) == color),
+                          mori.partial(mori.map, mori.first),
+                          mori.toJs),
 
-    getSize: function() {
-      return size;
-    },
+    getSize: () => size,
 
-    getIntersections: function() {
-      return mori.map(function(i) {
-        return mori.map(function(j) {
-          return getStone(stones, mori.vector(i, j));
-        }, mori.range(size));
-      }, mori.range(size));
-    },
+    getIntersections: () => mori.map(i => mori.map(j => getStone(stones, mori.vector(i, j)),
+                                                   mori.range(size)),
+                                     mori.range(size)),
 
     /*
      * Attempt to place a stone at (i,j).
      */
     play: function(color, coords) {
-      var i = coords[0], j = coords[1];
       coords = mori.toClj(coords);
 
       if (!inBounds(size, coords))
@@ -140,10 +120,8 @@ export function createBoard(size, stones) {
       var newBoard = replaceStone(stones, coords, color);
       var neighbors = getAdjacentIntersections(size, coords);
       var neighborColors = mori.zipmap(neighbors, mori.map(mori.partial(getStone, newBoard), neighbors));
-      var opponentColor = function(pair) {
-        return mori.nth(pair, 1) != color && mori.nth(pair, 1) != Constants.EMPTY;
-      };
-      var isDead = function(group) { return mori.get(group, 'liberties') === 0; };
+      var opponentColor = pair => mori.nth(pair, 1) != color && mori.nth(pair, 1) != Constants.EMPTY;
+      var isDead = group => mori.get(group, 'liberties') === 0;
       var captured = mori.pipeline(neighborColors,
         mori.partial(mori.filter, opponentColor),
         mori.partial(mori.map, mori.comp(mori.partial(getGroup, newBoard, size), mori.first)),
@@ -151,16 +129,17 @@ export function createBoard(size, stones) {
 
       // detect suicide
       var newGroup = getGroup(newBoard, size, coords);
-      if (mori.isEmpty(captured) && mori.get(newGroup, 'liberties') === 0) {
+      if (mori.isEmpty(captured) && isDead(newGroup)) {
         captured = mori.vector(newGroup);
       }
 
+      var replaceStones = (board, value, coords) =>
+        mori.reduce((acc, stone) => replaceStone(acc, stone, value), board, coords);
+
       // remove captured stones
       newBoard = mori.pipeline(captured,
-        mori.partial(mori.mapcat, function(g) {return mori.get(g, 'stones');}),
-        mori.partial(mori.reduce, function(board, stone) {
-          return replaceStone(board, stone, Constants.EMPTY);
-        }, newBoard));
+        mori.partial(mori.mapcat, g => mori.get(g, 'stones')),
+        mori.partial(replaceStones, newBoard, Constants.EMPTY));
 
       return createBoard(size, newBoard);
     },
@@ -180,7 +159,7 @@ export function createBoard(size, stones) {
         var group = getGroup(stones, size, coords);
         var groupStones = mori.get(group, 'stones');
         var surroundingColors = mori.pipeline(mori.get(group, 'surrounding'),
-          mori.partial(mori.map, function(pair) { return mori.nth(pair, 1); }),
+          mori.partial(mori.map, pair => mori.nth(pair, 1)),
           mori.partial(mori.into, mori.set()));
 
         if (state == Constants.EMPTY) {
