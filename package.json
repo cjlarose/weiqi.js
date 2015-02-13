@@ -2,9 +2,10 @@
   "name": "weiqi",
   "version": "0.0.7",
   "description": "An implementation of the ancient Chinese board board Go (Chinese: wéiqí, Korean: baduk, Japanese: igo)",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "mocha --reporter spec",
+    "build": "6to5 src --out-dir dist"
   },
   "repository": {
     "type": "git",
@@ -30,7 +31,8 @@
     "mori": "~0.3.2"
   },
   "devDependencies": {
-    "mocha": "~2.0.1",
-    "chai": "~1.10.0"
+    "6to5": "^3.5.3",
+    "chai": "~1.10.0",
+    "mocha": "~2.0.1"
   }
 }
