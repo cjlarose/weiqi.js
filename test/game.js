@@ -1,6 +1,6 @@
 var should = require('chai').should();
 var expect = require('chai').expect;
-var Weiqi = require('../index.js');
+var Weiqi = require('../dist/index.js');
 
 describe("Game", function() {
   describe('#createGame', function() {

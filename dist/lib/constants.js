@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  * Constants for intersection states
  */

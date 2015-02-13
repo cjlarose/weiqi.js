@@ -1,6 +1,6 @@
 var should = require('chai').should();
 var expect = require('chai').expect;
-var Weiqi = require('../index.js');
+var Weiqi = require('../dist/index.js');
 
 // shorthand for testing whole board
 Object.prototype.looksLike = function(rows) {
