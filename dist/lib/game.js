@@ -3,7 +3,7 @@
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 exports.createGame = createGame;
-var mori = _interopRequire(require("mori"));
+var Immutable = _interopRequire(require("immutable"));
 
 var createBoard = require("./board").createBoard;
 var Constants = _interopRequire(require("./constants"));
@@ -20,7 +20,7 @@ function createGame(boardSize, values) {
     currentColor = Constants.BLACK;
     consectutivePasses = 0;
     board = createBoard(boardSize);
-    history = mori.set(board.getIntersections());
+    history = Immutable.Set([board.getIntersections()]);
   }
 
   function opponentColor(color) {
@@ -28,7 +28,7 @@ function createGame(boardSize, values) {
   }
 
   function inHistory(otherBoard) {
-    return mori.hasKey(history, otherBoard.getIntersections());
+    return history.has(otherBoard.getIntersections());
   }
 
   var Game = {
@@ -56,7 +56,7 @@ function createGame(boardSize, values) {
         currentColor: opponentColor(currentColor),
         consectutivePasses: 0,
         board: newBoard,
-        history: mori.conj(history, newBoard.getIntersections())
+        history: history.add(newBoard.getIntersections())
       });
     },
 
