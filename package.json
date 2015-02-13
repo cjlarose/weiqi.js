@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/baduk-io/weiqi.js",
   "dependencies": {
+    "immutable": "^3.6.2",
     "mori": "~0.3.2"
   },
   "devDependencies": {
