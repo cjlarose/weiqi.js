@@ -1,4 +1,4 @@
-import mori from 'mori';
+import Immutable from 'immutable';
 import { createBoard } from './board';
 import Constants from './constants';
 
@@ -14,7 +14,7 @@ export function createGame(boardSize, values) {
     currentColor = Constants.BLACK;
     consectutivePasses = 0;
     board = createBoard(boardSize);
-    history = mori.set(board.getIntersections());
+    history = Immutable.Set([board.getIntersections()]);
   }
 
   function opponentColor(color) {
@@ -22,7 +22,7 @@ export function createGame(boardSize, values) {
   }
 
   function inHistory(otherBoard) {
-    return mori.hasKey(history, otherBoard.getIntersections());
+    return history.has(otherBoard.getIntersections());
   }
 
   var Game = {
@@ -53,7 +53,7 @@ export function createGame(boardSize, values) {
         currentColor: opponentColor(currentColor),
         consectutivePasses: 0,
         board: newBoard,
-        history: mori.conj(history, newBoard.getIntersections())
+        history: history.add(newBoard.getIntersections())
       });
     },
 
