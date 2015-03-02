@@ -3,9 +3,11 @@
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 exports.createGame = createGame;
+
 var Immutable = _interopRequire(require("immutable"));
 
 var createBoard = require("./board").createBoard;
+
 var Constants = _interopRequire(require("./constants"));
 
 function createGame(boardSize, values) {
@@ -32,19 +34,19 @@ function createGame(boardSize, values) {
   }
 
   var Game = {
-    isOver: function () {
+    isOver: function isOver() {
       return consectutivePasses >= 2;
     },
 
-    getCurrentPlayer: function () {
+    getCurrentPlayer: function getCurrentPlayer() {
       return currentColor;
     },
 
-    getBoard: function () {
+    getBoard: function getBoard() {
       return board;
     },
 
-    play: function (player, coords) {
+    play: function play(player, coords) {
       if (this.isOver()) throw "Game is already over";
 
       if (player != currentColor) throw "Not player's turn";
@@ -60,7 +62,7 @@ function createGame(boardSize, values) {
       });
     },
 
-    pass: function (player) {
+    pass: function pass(player) {
       if (this.isOver()) throw "Game is already over";
 
       if (player != currentColor) throw "Not player's turn";
@@ -76,7 +78,7 @@ function createGame(boardSize, values) {
     /*
      * Returns Black - White
      */
-    areaScore: function (komi) {
+    areaScore: function areaScore(komi) {
       if (typeof komi === "undefined") komi = 0;
 
       var boardScore = board.areaScore();
@@ -87,6 +89,7 @@ function createGame(boardSize, values) {
 
   return Object.create(Game);
 }
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });

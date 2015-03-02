@@ -3,6 +3,7 @@
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 exports.createBoard = createBoard;
+
 var Immutable = _interopRequire(require("immutable"));
 
 var Constants = _interopRequire(require("./constants"));
@@ -58,44 +59,49 @@ function allPositions(size) {
 function getGroup(stones, size, coords) {
   var color = getStone(stones, coords);
 
-  function search(visited, queue, surrounding) {
-    var _arguments = arguments,
-        _this = this,
-        _shouldContinue,
-        _result;
-    do {
-      _shouldContinue = false;
-      _result = (function (visited, queue, surrounding) {
-        if (queue.isEmpty()) return { visited: visited, surrounding: surrounding };
+  function search(_x, _x2, _x3) {
+    var _again = true;
 
-        var stone = queue.first();
-        queue = queue.shift();
+    _function: while (_again) {
+      _again = false;
+      var visited = _x,
+          queue = _x2,
+          surrounding = _x3;
+      stone = neighbors = undefined;
 
-        if (visited.has(stone)) {
-          _arguments = [visited, queue, surrounding];
-          _this = undefined;
-          return _shouldContinue = true;
-        }
+      if (queue.isEmpty()) {
+        return { visited: visited, surrounding: surrounding };
+      }var stone = queue.first();
+      queue = queue.shift();
 
-        var neighbors = getAdjacentIntersections(size, stone);
-        neighbors.forEach(function (n) {
-          var state = getStone(stones, n);
-          if (state == color) queue = queue.push(n);else surrounding = surrounding.set(n, state);
-        });
+      if (visited.has(stone)) {
+        _x = visited;
+        _x2 = queue;
+        _x3 = surrounding;
+        _again = true;
+        continue _function;
+      }
 
-        visited = visited.add(stone);
-        _arguments = [visited, queue, surrounding];
-        _this = undefined;
-        return _shouldContinue = true;
-      }).apply(_this, _arguments);
-    } while (_shouldContinue);
-    return _result;
+      var neighbors = getAdjacentIntersections(size, stone);
+      neighbors.forEach(function (n) {
+        var state = getStone(stones, n);
+        if (state == color) queue = queue.push(n);else surrounding = surrounding.set(n, state);
+      });
+
+      visited = visited.add(stone);
+      _x = visited;
+      _x2 = queue;
+      _x3 = surrounding;
+      _again = true;
+      continue _function;
+    }
   }
 
   var _search = search(Immutable.Set(), Immutable.List([coords]), Immutable.Map());
 
   var visited = _search.visited;
   var surrounding = _search.surrounding;
+
   var liberties = surrounding.filter(function (color) {
     return color == Constants.EMPTY;
   });
@@ -116,7 +122,7 @@ function createBoard(size, stones) {
       return getStone(stones, Immutable.List(coords));
     },
 
-    toArray: function () {
+    toArray: function toArray() {
       return this.getIntersections().toJS();
     },
 
@@ -142,7 +148,7 @@ function createBoard(size, stones) {
     /*
      * Attempt to place a stone at (i,j).
      */
-    play: function (color, coords) {
+    play: function play(color, coords) {
       coords = Immutable.List(coords);
 
       if (!inBounds(size, coords)) throw "Intersection out of bounds";
@@ -177,7 +183,7 @@ function createBoard(size, stones) {
       return createBoard(size, newBoard);
     },
 
-    areaScore: function () {
+    areaScore: function areaScore() {
       var positions = allPositions(size);
       var visited = Immutable.Set();
       var score = {};
@@ -206,7 +212,9 @@ function createBoard(size, stones) {
   };
 
   return Object.create(Board);
-};
+}
+
+;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
