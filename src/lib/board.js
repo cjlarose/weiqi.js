@@ -1,9 +1,14 @@
 import Immutable from 'immutable';
 import Constants from './constants';
 
-function inBounds(size, coords) {
-  var i = coords.get(0), j = coords.get(1);
-  return i >= 0 && i < size && j >= 0 && j < size;
+class Point extends Immutable.Record({i: 0, j: 0}) {
+  constructor(i, j) {
+    super({i: i, j: j});
+  }
+}
+
+function inBounds(size, point) {
+  return point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
 }
 
 function getStone(stones, coords) {
@@ -14,24 +19,24 @@ function replaceStone(stones, coords, value) {
   return stones.set(coords, value);
 }
 
-var deltas = Immutable.List.of(Immutable.List.of(-1, 0),
-                               Immutable.List.of(0, 1),
-                               Immutable.List.of(1, 0),
-                               Immutable.List.of(0, -1));
+var deltas = Immutable.List.of(new Point(-1, 0),
+                               new Point(0, 1),
+                               new Point(1, 0),
+                               new Point(0, -1));
+
 
 /*
  * Given a board position, returns a list of [i,j] coordinates representing
  * orthagonally adjacent intersections
  */
 function getAdjacentIntersections(size, coords) {
-  var i = coords.get(0), j = coords.get(1);
-  var addPair = vec => Immutable.List.of(vec.get(0) + i, vec.get(1) + j);
+  var addPair = vec => new Point(vec.i + coords.i, vec.j + coords.j);
   return deltas.map(addPair).filter(coord => inBounds(size, coord));
 }
 
 function allPositions(size) {
   var range = Immutable.Range(0, size);
-  return range.flatMap(i => range.map(j => Immutable.List.of(i, j)));
+  return range.flatMap(i => range.map(j => new Point(i, j)));
 }
 
 /*
@@ -85,7 +90,7 @@ export function createBoard(size, stones) {
 
   var Board = {
 
-    getStone: coords => getStone(stones, Immutable.List(coords)),
+    getStone: coords => getStone(stones, new Point(coords[0], coords[1])),
 
     toArray: function() {
       return this.getIntersections().toJS();
@@ -94,25 +99,26 @@ export function createBoard(size, stones) {
     getStones: color => stones
       .filter((stoneColor) => stoneColor == color)
       .keySeq()
+      .map((point) => [point.i, point.j])
       .toJS(),
 
     getSize: () => size,
 
     getIntersections: () => {
       var range = Immutable.Range(0, size);
-      return range.map(i => range.map(j => getStone(stones, Immutable.List([i, j]))));
+      return range.map(i => range.map(j => getStone(stones, new Point(i, j))));
     },
 
     /*
      * Attempt to place a stone at (i,j).
      */
     play: function(color, coords) {
-      coords = Immutable.List(coords);
+      coords = new Point(coords[0], coords[1]);
 
       if (!inBounds(size, coords))
         throw "Intersection out of bounds";
 
-      if (this.getStone(coords) != Constants.EMPTY)
+      if (getStone(stones, coords) != Constants.EMPTY)
         throw "Intersection occupied by existing stone";
 
       var newBoard = replaceStone(stones, coords, color);

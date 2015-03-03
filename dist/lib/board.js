@@ -2,16 +2,32 @@
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 exports.createBoard = createBoard;
 
 var Immutable = _interopRequire(require("immutable"));
 
 var Constants = _interopRequire(require("./constants"));
 
-function inBounds(size, coords) {
-  var i = coords.get(0),
-      j = coords.get(1);
-  return i >= 0 && i < size && j >= 0 && j < size;
+var Point = (function (_Immutable$Record) {
+  function Point(i, j) {
+    _classCallCheck(this, Point);
+
+    _get(Object.getPrototypeOf(Point.prototype), "constructor", this).call(this, { i: i, j: j });
+  }
+
+  _inherits(Point, _Immutable$Record);
+
+  return Point;
+})(Immutable.Record({ i: 0, j: 0 }));
+
+function inBounds(size, point) {
+  return point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
 }
 
 function getStone(stones, coords) {
@@ -22,17 +38,15 @@ function replaceStone(stones, coords, value) {
   return stones.set(coords, value);
 }
 
-var deltas = Immutable.List.of(Immutable.List.of(-1, 0), Immutable.List.of(0, 1), Immutable.List.of(1, 0), Immutable.List.of(0, -1));
+var deltas = Immutable.List.of(new Point(-1, 0), new Point(0, 1), new Point(1, 0), new Point(0, -1));
 
 /*
  * Given a board position, returns a list of [i,j] coordinates representing
  * orthagonally adjacent intersections
  */
 function getAdjacentIntersections(size, coords) {
-  var i = coords.get(0),
-      j = coords.get(1);
   var addPair = function (vec) {
-    return Immutable.List.of(vec.get(0) + i, vec.get(1) + j);
+    return new Point(vec.i + coords.i, vec.j + coords.j);
   };
   return deltas.map(addPair).filter(function (coord) {
     return inBounds(size, coord);
@@ -43,7 +57,7 @@ function allPositions(size) {
   var range = Immutable.Range(0, size);
   return range.flatMap(function (i) {
     return range.map(function (j) {
-      return Immutable.List.of(i, j);
+      return new Point(i, j);
     });
   });
 }
@@ -119,7 +133,7 @@ function createBoard(size, stones) {
   var Board = {
 
     getStone: function (coords) {
-      return getStone(stones, Immutable.List(coords));
+      return getStone(stones, new Point(coords[0], coords[1]));
     },
 
     toArray: function toArray() {
@@ -129,7 +143,9 @@ function createBoard(size, stones) {
     getStones: function (color) {
       return stones.filter(function (stoneColor) {
         return stoneColor == color;
-      }).keySeq().toJS();
+      }).keySeq().map(function (point) {
+        return [point.i, point.j];
+      }).toJS();
     },
 
     getSize: function () {
@@ -140,7 +156,7 @@ function createBoard(size, stones) {
       var range = Immutable.Range(0, size);
       return range.map(function (i) {
         return range.map(function (j) {
-          return getStone(stones, Immutable.List([i, j]));
+          return getStone(stones, new Point(i, j));
         });
       });
     },
@@ -149,11 +165,11 @@ function createBoard(size, stones) {
      * Attempt to place a stone at (i,j).
      */
     play: function play(color, coords) {
-      coords = Immutable.List(coords);
+      coords = new Point(coords[0], coords[1]);
 
       if (!inBounds(size, coords)) throw "Intersection out of bounds";
 
-      if (this.getStone(coords) != Constants.EMPTY) throw "Intersection occupied by existing stone";
+      if (getStone(stones, coords) != Constants.EMPTY) throw "Intersection occupied by existing stone";
 
       var newBoard = replaceStone(stones, coords, color);
       var neighbors = getAdjacentIntersections(size, coords);
