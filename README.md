@@ -1,4 +1,4 @@
-# weiqi.js [![Build Status](https://travis-ci.org/baduk-io/weiqi.js.svg?branch=master)](https://travis-ci.org/baduk-io/weiqi.js)
+# weiqi.js [![Build Status](https://travis-ci.org/cjlarose/weiqi.js.svg?branch=master)](https://travis-ci.org/cjlarose/weiqi.js)
 
 `weiqi.js` is an implementation of the board game [Go][1]. It provides
 mechanisms for representing a board with black and white stones, as well as the
