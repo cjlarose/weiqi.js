@@ -96,11 +96,7 @@ export function createBoard(size, stones) {
       return this.getIntersections().toJS();
     },
 
-    getStones: color => stones
-      .filter((stoneColor) => stoneColor == color)
-      .keySeq()
-      .map((point) => [point.i, point.j])
-      .toJS(),
+    _getStones: () => stones,
 
     getSize: () => size,
 

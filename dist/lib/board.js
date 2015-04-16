@@ -9,6 +9,9 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 exports.createBoard = createBoard;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var Immutable = _interopRequire(require("immutable"));
 
@@ -140,12 +143,8 @@ function createBoard(size, stones) {
       return this.getIntersections().toJS();
     },
 
-    getStones: function (color) {
-      return stones.filter(function (stoneColor) {
-        return stoneColor == color;
-      }).keySeq().map(function (point) {
-        return [point.i, point.j];
-      }).toJS();
+    _getStones: function () {
+      return stones;
     },
 
     getSize: function () {
@@ -231,6 +230,3 @@ function createBoard(size, stones) {
 }
 
 ;
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});

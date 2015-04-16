@@ -3,6 +3,9 @@
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 exports.createGame = createGame;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var Immutable = _interopRequire(require("immutable"));
 
@@ -89,7 +92,3 @@ function createGame(boardSize, values) {
 
   return Object.create(Game);
 }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
