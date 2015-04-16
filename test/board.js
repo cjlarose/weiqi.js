@@ -186,25 +186,6 @@ describe("Board", function() {
     });
   });
 
-  describe('#getStones', function() {
-    it('should return nothing for an empty board', function() {
-      var board = Weiqi.createBoard(9);
-      board.getStones(Weiqi.BLACK).length.should.equal(0);
-      board.getStones(Weiqi.WHITE).length.should.equal(0);
-    });
-
-    it('should return only the correct color', function() {
-      var board = Weiqi.createBoard(9)
-        .play(Weiqi.BLACK, [2, 2])
-        .play(Weiqi.BLACK, [2, 3])
-        .play(Weiqi.WHITE, [6, 6])
-        .play(Weiqi.WHITE, [7, 6]);
-
-      board.getStones(Weiqi.BLACK).should.deep.have.members([[2, 2], [2, 3]]);
-      board.getStones(Weiqi.WHITE).should.deep.have.members([[7, 6], [6, 6]]);
-    });
-  });
-
   describe('#areaScore', function() {
     it('should not award points for empty board', function() {
       var board = Weiqi.createBoard(4);
