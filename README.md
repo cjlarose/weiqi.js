@@ -6,6 +6,11 @@ logic to actually play a game. The objects used in `weiqi.js` are
 [persistent][2]--methods often return entirely new instances instead of
 mutating internal state.
 
+Persistence and structural offer a memory-efficient way to represent multiple
+states of the board simutaneously, a desirable trait for applications where
+you'd like to explore the history of the game (such as for review) or to
+explore possible future responses (such as for AI decision-making).
+
 [1]: http://en.wikipedia.org/wiki/Go_%28game%29
 [2]: http://en.wikipedia.org/wiki/Persistent_data_structure
 
