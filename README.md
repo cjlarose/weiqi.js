@@ -20,8 +20,8 @@ browser with tools like [browserify][4].
 [3]: https://www.npmjs.com/package/weiqi
 [4]: http://browserify.org/
 
-** Note: This library's API is still unstable. There will be breaking API
-changes in future releases. **
+**Note: This library's API is still unstable. There will be breaking API
+changes in future releases.**
 
 [5]: http://semver.org/
 
