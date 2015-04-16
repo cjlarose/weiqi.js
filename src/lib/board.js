@@ -16,7 +16,10 @@ function getStone(stones, coords) {
 }
 
 function replaceStone(stones, coords, value) {
-  return stones.set(coords, value);
+  if (value == Constants.EMPTY)
+    return stones.remove(coords)
+  else
+    return stones.set(coords, value);
 }
 
 var deltas = Immutable.List.of(new Point(-1, 0),
