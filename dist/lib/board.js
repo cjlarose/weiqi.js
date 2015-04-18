@@ -2,6 +2,8 @@
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
@@ -28,6 +30,35 @@ var Point = (function (_Immutable$Record) {
 
   return Point;
 })(Immutable.Record({ i: 0, j: 0 }));
+
+var Group = (function (_Immutable$Record2) {
+  function Group() {
+    _classCallCheck(this, Group);
+
+    if (_Immutable$Record2 != null) {
+      _Immutable$Record2.apply(this, arguments);
+    }
+  }
+
+  _inherits(Group, _Immutable$Record2);
+
+  _createClass(Group, {
+    isDead: {
+      value: function isDead() {
+        return this.getLiberties().isEmpty();
+      }
+    },
+    getLiberties: {
+      value: function getLiberties() {
+        return this.surrounding.filter(function (color) {
+          return color == Constants.EMPTY;
+        });
+      }
+    }
+  });
+
+  return Group;
+})(Immutable.Record({ stones: null, surrounding: null }));
 
 function inBounds(size, point) {
   return point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
@@ -72,10 +103,7 @@ function allPositions(size) {
 /*
  * Performs a breadth-first search about an (i,j) position to find recursively
  * orthagonally adjacent stones of the same color (stones with which it shares
- * liberties). Returns null for if there is no stone at the specified position,
- * otherwise returns an object with two keys: "liberties", specifying the
- * number of liberties the group has, and "stones", the list of [i,j]
- * coordinates of the group's members.
+ * liberties).
  */
 function getGroup(stones, size, coords) {
   var color = getStone(stones, coords);
@@ -123,12 +151,7 @@ function getGroup(stones, size, coords) {
   var visited = _search.visited;
   var surrounding = _search.surrounding;
 
-  var liberties = surrounding.filter(function (color) {
-    return color == Constants.EMPTY;
-  });
-
-  return Immutable.Map({ liberties: liberties.size,
-    stones: visited,
+  return new Group({ stones: visited,
     surrounding: surrounding });
 }
 
@@ -182,16 +205,15 @@ function createBoard(size, stones) {
       var opponentColor = function (stoneColor, coords) {
         return stoneColor != color && stoneColor != Constants.EMPTY;
       };
-      var isDead = function (group) {
-        return group.get("liberties") === 0;
-      };
       var captured = neighborColors.filter(opponentColor).map(function (val, coord) {
         return getGroup(newBoard, size, coord);
-      }).valueSeq().filter(isDead);
+      }).valueSeq().filter(function (g) {
+        return g.isDead();
+      });
 
       // detect suicide
       var newGroup = getGroup(newBoard, size, coords);
-      if (captured.isEmpty() && isDead(newGroup)) captured = Immutable.List([newGroup]);
+      if (captured.isEmpty() && newGroup.isDead()) captured = Immutable.List([newGroup]);
 
       newBoard = captured.flatMap(function (g) {
         return g.get("stones");
