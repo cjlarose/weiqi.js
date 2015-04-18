@@ -7,6 +7,16 @@ class Point extends Immutable.Record({i: 0, j: 0}) {
   }
 }
 
+class Group extends Immutable.Record({stones: null, surrounding: null}) {
+  isDead() {
+    return this.getLiberties().isEmpty();
+  }
+
+  getLiberties() {
+    return this.surrounding.filter(color => color == Constants.EMPTY);
+  }
+}
+
 function inBounds(size, point) {
   return point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
 }
@@ -45,10 +55,7 @@ function allPositions(size) {
 /*
  * Performs a breadth-first search about an (i,j) position to find recursively
  * orthagonally adjacent stones of the same color (stones with which it shares
- * liberties). Returns null for if there is no stone at the specified position,
- * otherwise returns an object with two keys: "liberties", specifying the
- * number of liberties the group has, and "stones", the list of [i,j]
- * coordinates of the group's members.
+ * liberties).
  */
 function getGroup(stones, size, coords) {
   var color = getStone(stones, coords);
@@ -77,11 +84,9 @@ function getGroup(stones, size, coords) {
   }
 
   var {visited, surrounding} = search(Immutable.Set(), Immutable.List([coords]), Immutable.Map());
-  var liberties = surrounding.filter(color => color == Constants.EMPTY);
 
-  return Immutable.Map({'liberties'  : liberties.size,
-                        'stones'     : visited,
-                        'surrounding': surrounding});
+  return new Group({ stones       : visited,
+                     surrounding  : surrounding });
 }
 
 export function createBoard(size, stones) {
@@ -124,16 +129,15 @@ export function createBoard(size, stones) {
       var neighbors = getAdjacentIntersections(size, coords);
       var neighborColors = Immutable.Map(neighbors.zipWith(n => [n, getStone(newBoard, n)]));
       var opponentColor = (stoneColor, coords) => stoneColor != color && stoneColor != Constants.EMPTY;
-      var isDead = group => group.get('liberties') === 0;
       var captured = neighborColors
         .filter(opponentColor)
         .map((val, coord) => getGroup(newBoard, size, coord))
         .valueSeq()
-        .filter(isDead);
+        .filter(g => g.isDead());
 
       // detect suicide
       var newGroup = getGroup(newBoard, size, coords);
-      if (captured.isEmpty() && isDead(newGroup))
+      if (captured.isEmpty() && newGroup.isDead())
         captured = Immutable.List([newGroup]);
 
       newBoard = captured
