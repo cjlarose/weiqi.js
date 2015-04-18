@@ -4,8 +4,8 @@
   "description": "An implementation of the ancient Chinese board board Go (Chinese: wéiqí, Korean: baduk, Japanese: igo)",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha --reporter spec",
-    "build": "babel src --out-dir dist"
+    "test": "make test",
+    "build": "make"
   },
   "repository": {
     "type": "git",
