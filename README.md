@@ -23,8 +23,6 @@ browser with tools like [browserify][4].
 **Note: This library's API is still unstable. There will be breaking API
 changes in future releases.**
 
-[5]: http://semver.org/
-
 ## Playing a game
 
 ```javascript
@@ -36,7 +34,7 @@ var game = Weiqi.createGame(9)            // creates a game with a 9 x 9 board
                 .pass(Weiqi.WHITE);       // white passes
 ```
 
-`Weiqi.Game` handle captures appropriately. It forbids the same player playing twice.
+`Weiqi.Game` handles captures appropriately. It forbids the same color playing twice.
 It enforces [positional superko][5]--at the end of any turn, the board cannot
 be in a state in which it has been previously.
 
