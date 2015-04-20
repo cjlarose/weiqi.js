@@ -59,7 +59,7 @@ Seq [ Seq [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
       Seq [ ".", ".", ".", ".", ".", ".", ".", ".", "." ] ]
 ```
 
-Alternatively, you can retrieve the board state as a stanrard JavaScript Array.
+Alternatively, you can retrieve the board state as a standard JavaScript Array.
 
 ```javascript
 > game.getBoard().toArray()
