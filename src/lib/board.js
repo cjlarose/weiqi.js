@@ -110,7 +110,7 @@ export function createBoard(size, stones) {
 
     getIntersections: () => {
       var range = Immutable.Range(0, size);
-      return range.map(i => range.map(j => getStone(stones, new Point(i, j))));
+      return range.map(i => range.map(j => getStone(stones, new Point(i, j))).toList()).toList();
     },
 
     /*
