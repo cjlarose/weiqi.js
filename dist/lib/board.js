@@ -183,8 +183,8 @@ function createBoard(size, stones) {
       return range.map(function (i) {
         return range.map(function (j) {
           return getStone(stones, new Point(i, j));
-        });
-      });
+        }).toList();
+      }).toList();
     },
 
     /*
