@@ -83,7 +83,9 @@ function getGroup(stones, size, coords) {
     return search(visited, queue, surrounding);
   }
 
-  var {visited, surrounding} = search(Immutable.Set(), Immutable.List([coords]), Immutable.Map());
+  var {visited, surrounding} = search(Immutable.Set(),
+                                      Immutable.List([coords]),
+                                      Immutable.Map());
 
   return new Group({ stones       : visited,
                      surrounding  : surrounding });
@@ -115,7 +117,9 @@ class Board {
 
   getIntersections() {
     var range = Immutable.Range(0, this.size);
-    return range.map(i => range.map(j => getStone(this.stones, new Point(i, j))).toList()).toList();
+    return range.map(i =>
+      range.map(j => getStone(this.stones, new Point(i, j))).toList()
+    ).toList();
   }
 
   play(color, coords) {
