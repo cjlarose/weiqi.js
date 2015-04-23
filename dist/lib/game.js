@@ -25,7 +25,7 @@ function createGame(boardSize, values) {
     currentColor = Constants.BLACK;
     consectutivePasses = 0;
     board = createBoard(boardSize);
-    history = Immutable.Set([board._getStones()]);
+    history = Immutable.Set([board.stones]);
   }
 
   function opponentColor(color) {
@@ -33,7 +33,7 @@ function createGame(boardSize, values) {
   }
 
   function inHistory(otherBoard) {
-    return history.has(otherBoard._getStones());
+    return history.has(otherBoard.stones);
   }
 
   var Game = {
@@ -61,7 +61,7 @@ function createGame(boardSize, values) {
         currentColor: opponentColor(currentColor),
         consectutivePasses: 0,
         board: newBoard,
-        history: history.add(newBoard._getStones())
+        history: history.add(newBoard.stones)
       });
     },
 

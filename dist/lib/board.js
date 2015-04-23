@@ -108,14 +108,14 @@ function allPositions(size) {
 function getGroup(stones, size, coords) {
   var color = getStone(stones, coords);
 
-  function search(_x, _x2, _x3) {
+  function search(_x2, _x3, _x4) {
     var _again = true;
 
     _function: while (_again) {
       _again = false;
-      var visited = _x,
-          queue = _x2,
-          surrounding = _x3;
+      var visited = _x2,
+          queue = _x3,
+          surrounding = _x4;
       stone = neighbors = undefined;
 
       if (queue.isEmpty()) {
@@ -124,9 +124,9 @@ function getGroup(stones, size, coords) {
       queue = queue.shift();
 
       if (visited.has(stone)) {
-        _x = visited;
-        _x2 = queue;
-        _x3 = surrounding;
+        _x2 = visited;
+        _x3 = queue;
+        _x4 = surrounding;
         _again = true;
         continue _function;
       }
@@ -138,9 +138,9 @@ function getGroup(stones, size, coords) {
       });
 
       visited = visited.add(stone);
-      _x = visited;
-      _x2 = queue;
-      _x3 = surrounding;
+      _x2 = visited;
+      _x3 = queue;
+      _x4 = surrounding;
       _again = true;
       continue _function;
     }
@@ -155,104 +155,130 @@ function getGroup(stones, size, coords) {
     surrounding: surrounding });
 }
 
-function createBoard(size, stones) {
-  if (typeof size === "undefined" || size < 0) throw "Size must be an integer greater than zero";
+var Board = (function () {
+  function Board(size, stones) {
+    _classCallCheck(this, Board);
 
-  if (typeof stones === "undefined") stones = Immutable.Map();
+    if (typeof size === "undefined" || size < 0) throw "Size must be an integer greater than zero";
 
-  var Board = {
+    if (typeof stones === "undefined") stones = Immutable.Map();
 
-    getStone: function (coords) {
-      return getStone(stones, new Point(coords[0], coords[1]));
+    this.size = size;
+    this.stones = stones;
+  }
+
+  _createClass(Board, {
+    getStone: {
+      value: (function (_getStone) {
+        var _getStoneWrapper = function getStone(_x) {
+          return _getStone.apply(this, arguments);
+        };
+
+        _getStoneWrapper.toString = function () {
+          return _getStone.toString();
+        };
+
+        return _getStoneWrapper;
+      })(function (coords) {
+        return getStone(this.stones, new Point(coords[0], coords[1]));
+      })
     },
-
-    toArray: function toArray() {
-      return this.getIntersections().toJS();
+    getSize: {
+      value: function getSize() {
+        return this.size;
+      }
     },
-
-    _getStones: function () {
-      return stones;
+    toArray: {
+      value: function toArray() {
+        return this.getIntersections().toJS();
+      }
     },
+    getIntersections: {
+      value: function getIntersections() {
+        var _this = this;
 
-    getSize: function () {
-      return size;
-    },
-
-    getIntersections: function () {
-      var range = Immutable.Range(0, size);
-      return range.map(function (i) {
-        return range.map(function (j) {
-          return getStone(stones, new Point(i, j));
+        var range = Immutable.Range(0, this.size);
+        return range.map(function (i) {
+          return range.map(function (j) {
+            return getStone(_this.stones, new Point(i, j));
+          }).toList();
         }).toList();
-      }).toList();
+      }
     },
+    play: {
+      value: function play(color, coords) {
+        var _this = this;
 
-    /*
-     * Attempt to place a stone at (i,j).
-     */
-    play: function play(color, coords) {
-      coords = new Point(coords[0], coords[1]);
+        coords = new Point(coords[0], coords[1]);
 
-      if (!inBounds(size, coords)) throw "Intersection out of bounds";
+        if (!inBounds(this.size, coords)) throw "Intersection out of bounds";
 
-      if (getStone(stones, coords) != Constants.EMPTY) throw "Intersection occupied by existing stone";
+        if (getStone(this.stones, coords) != Constants.EMPTY) throw "Intersection occupied by existing stone";
 
-      var newBoard = replaceStone(stones, coords, color);
-      var neighbors = getAdjacentIntersections(size, coords);
-      var neighborColors = Immutable.Map(neighbors.zipWith(function (n) {
-        return [n, getStone(newBoard, n)];
-      }));
-      var opponentColor = function (stoneColor, coords) {
-        return stoneColor != color && stoneColor != Constants.EMPTY;
-      };
-      var captured = neighborColors.filter(opponentColor).map(function (val, coord) {
-        return getGroup(newBoard, size, coord);
-      }).valueSeq().filter(function (g) {
-        return g.isDead();
-      });
+        var newBoard = replaceStone(this.stones, coords, color);
+        var neighbors = getAdjacentIntersections(this.size, coords);
+        var neighborColors = Immutable.Map(neighbors.zipWith(function (n) {
+          return [n, getStone(newBoard, n)];
+        }));
+        var opponentColor = function (stoneColor, coords) {
+          return stoneColor != color && stoneColor != Constants.EMPTY;
+        };
+        var captured = neighborColors.filter(opponentColor).map(function (val, coord) {
+          return getGroup(newBoard, _this.size, coord);
+        }).valueSeq().filter(function (g) {
+          return g.isDead();
+        });
 
-      // detect suicide
-      var newGroup = getGroup(newBoard, size, coords);
-      if (captured.isEmpty() && newGroup.isDead()) captured = Immutable.List([newGroup]);
+        // detect suicide
+        var newGroup = getGroup(newBoard, this.size, coords);
+        if (captured.isEmpty() && newGroup.isDead()) captured = Immutable.List([newGroup]);
 
-      newBoard = captured.flatMap(function (g) {
-        return g.get("stones");
-      }).reduce(function (acc, stone) {
-        return replaceStone(acc, stone, Constants.EMPTY);
-      }, newBoard);
+        newBoard = captured.flatMap(function (g) {
+          return g.get("stones");
+        }).reduce(function (acc, stone) {
+          return replaceStone(acc, stone, Constants.EMPTY);
+        }, newBoard);
 
-      return createBoard(size, newBoard);
+        return createBoard(this.size, newBoard);
+      }
     },
+    areaScore: {
+      value: function areaScore() {
+        var _this = this;
 
-    areaScore: function areaScore() {
-      var positions = allPositions(size);
-      var visited = Immutable.Set();
-      var score = {};
-      score[Constants.BLACK] = 0;
-      score[Constants.WHITE] = 0;
+        var positions = allPositions(this.size);
+        var visited = Immutable.Set();
+        var score = {};
+        score[Constants.BLACK] = 0;
+        score[Constants.WHITE] = 0;
 
-      positions.forEach(function (coords) {
-        if (visited.has(coords)) return;
+        positions.forEach(function (coords) {
+          if (visited.has(coords)) return;
 
-        var state = getStone(stones, coords);
-        var group = getGroup(stones, size, coords);
-        var groupStones = group.get("stones");
-        var surroundingColors = group.get("surrounding").valueSeq().toSet();
+          var state = getStone(_this.stones, coords);
+          var group = getGroup(_this.stones, _this.size, coords);
+          var groupStones = group.get("stones");
+          var surroundingColors = group.get("surrounding").valueSeq().toSet();
 
-        if (state == Constants.EMPTY) {
-          if (surroundingColors.size === 1) score[surroundingColors.first()] += groupStones.size;
-        } else {
-          score[state] += groupStones.size;
-        }
+          if (state == Constants.EMPTY) {
+            if (surroundingColors.size === 1) score[surroundingColors.first()] += groupStones.size;
+          } else {
+            score[state] += groupStones.size;
+          }
 
-        visited = visited.union(groupStones);
-      });
+          visited = visited.union(groupStones);
+        });
 
-      return score;
+        return score;
+      }
     }
-  };
+  });
 
-  return Object.create(Board);
+  return Board;
+})();
+
+function createBoard(size, stones) {
+  return new Board(size, stones);
 }
 
 ;
