@@ -1,10 +1,7 @@
 import Immutable from 'immutable';
 import { createBoard } from './board';
+import { opponentColor } from './util';
 import Constants from './constants';
-
-function opponentColor(color) {
-  return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
-}
 
 class Game {
   constructor(boardSize, values) {

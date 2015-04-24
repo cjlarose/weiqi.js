@@ -15,11 +15,9 @@ var Immutable = _interopRequire(require("immutable"));
 
 var createBoard = require("./board").createBoard;
 
-var Constants = _interopRequire(require("./constants"));
+var opponentColor = require("./util").opponentColor;
 
-function opponentColor(color) {
-  return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
-}
+var Constants = _interopRequire(require("./constants"));
 
 var Game = (function () {
   function Game(boardSize, values) {

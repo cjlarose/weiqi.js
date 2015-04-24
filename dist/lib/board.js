@@ -17,6 +17,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var Immutable = _interopRequire(require("immutable"));
 
+var opponentColor = require("./util").opponentColor;
+
 var Constants = _interopRequire(require("./constants"));
 
 var Point = (function (_Immutable$Record) {
@@ -220,10 +222,10 @@ var Board = (function () {
         var neighborColors = Immutable.Map(neighbors.zipWith(function (n) {
           return [n, getStone(newBoard, n)];
         }));
-        var opponentColor = function (stoneColor, coords) {
-          return stoneColor != color && stoneColor != Constants.EMPTY;
+        var isOpponentColor = function (stoneColor, _) {
+          return stoneColor === opponentColor(color);
         };
-        var captured = neighborColors.filter(opponentColor).map(function (val, coord) {
+        var captured = neighborColors.filter(isOpponentColor).map(function (val, coord) {
           return getGroup(newBoard, _this.size, coord);
         }).valueSeq().filter(function (g) {
           return g.isDead();

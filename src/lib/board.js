@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import { opponentColor } from './util';
 import Constants from './constants';
 
 class Point extends Immutable.Record({i: 0, j: 0}) {
@@ -134,9 +135,9 @@ class Board {
     var newBoard = replaceStone(this.stones, coords, color);
     var neighbors = getAdjacentIntersections(this.size, coords);
     var neighborColors = Immutable.Map(neighbors.zipWith(n => [n, getStone(newBoard, n)]));
-    var opponentColor = (stoneColor, coords) => stoneColor != color && stoneColor != Constants.EMPTY;
+    var isOpponentColor = (stoneColor, _) => stoneColor === opponentColor(color);
     var captured = neighborColors
-      .filter(opponentColor)
+      .filter(isOpponentColor)
       .map((val, coord) => getGroup(newBoard, this.size, coord))
       .valueSeq()
       .filter(g => g.isDead());
