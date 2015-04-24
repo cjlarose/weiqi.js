@@ -14,7 +14,7 @@ class Group extends Immutable.Record({stones: null, surrounding: null}) {
   }
 
   getLiberties() {
-    return this.surrounding.filter(color => color == Constants.EMPTY);
+    return this.surrounding.filter(color => color === Constants.EMPTY);
   }
 }
 
@@ -25,7 +25,7 @@ const getStone = (stones, coords) =>
   stones.get(coords, Constants.EMPTY);
 
 const replaceStone = (stones, coords, value) => {
-  if (value == Constants.EMPTY)
+  if (value === Constants.EMPTY)
     return removeStone(coords);
   else
     return stones.set(coords, value);
@@ -75,7 +75,7 @@ const getGroup = (stones, size, coords) => {
     const neighbors = getAdjacentIntersections(size, stone);
     neighbors.forEach(n => {
       const state = getStone(stones, n);
-      if (state == color)
+      if (state === color)
         queue = queue.push(n);
       else
         surrounding = surrounding.set(n, state);

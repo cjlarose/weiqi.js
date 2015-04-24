@@ -52,7 +52,7 @@ var Group = (function (_Immutable$Record2) {
     getLiberties: {
       value: function getLiberties() {
         return this.surrounding.filter(function (color) {
-          return color == Constants.EMPTY;
+          return color === Constants.EMPTY;
         });
       }
     }
@@ -70,7 +70,7 @@ var getStone = function (stones, coords) {
 };
 
 var replaceStone = function (stones, coords, value) {
-  if (value == Constants.EMPTY) return removeStone(coords);else return stones.set(coords, value);
+  if (value === Constants.EMPTY) return removeStone(coords);else return stones.set(coords, value);
 };
 
 var removeStone = function (stones, coords) {
@@ -120,7 +120,7 @@ var getGroup = function (stones, size, coords) {
     var neighbors = getAdjacentIntersections(size, stone);
     neighbors.forEach(function (n) {
       var state = getStone(stones, n);
-      if (state == color) queue = queue.push(n);else surrounding = surrounding.set(n, state);
+      if (state === color) queue = queue.push(n);else surrounding = surrounding.set(n, state);
     });
 
     visited = visited.add(stone);
