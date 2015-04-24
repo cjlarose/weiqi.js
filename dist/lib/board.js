@@ -10,7 +10,6 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-exports.createBoard = createBoard;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -62,25 +61,21 @@ var Group = (function (_Immutable$Record2) {
   return Group;
 })(Immutable.Record({ stones: null, surrounding: null }));
 
-function inBounds(size, point) {
+var inBounds = function (size, point) {
   return point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
-}
+};
 
-function getStone(stones, coords) {
+var getStone = function (stones, coords) {
   return stones.get(coords, Constants.EMPTY);
-}
+};
 
-function replaceStone(stones, coords, value) {
-  if (value == Constants.EMPTY) {
-    return removeStone(coords);
-  } else {
-    return stones.set(coords, value);
-  }
-}
+var replaceStone = function (stones, coords, value) {
+  if (value == Constants.EMPTY) return removeStone(coords);else return stones.set(coords, value);
+};
 
-function removeStone(stones, coords) {
+var removeStone = function (stones, coords) {
   return stones.remove(coords);
-}
+};
 
 var deltas = Immutable.List.of(new Point(-1, 0), new Point(0, 1), new Point(1, 0), new Point(0, -1));
 
@@ -88,69 +83,49 @@ var deltas = Immutable.List.of(new Point(-1, 0), new Point(0, 1), new Point(1, 0
  * Given a board position, returns a list of [i,j] coordinates representing
  * orthagonally adjacent intersections
  */
-function getAdjacentIntersections(size, coords) {
+var getAdjacentIntersections = function (size, coords) {
   var addPair = function (vec) {
     return new Point(vec.i + coords.i, vec.j + coords.j);
   };
   return deltas.map(addPair).filter(function (coord) {
     return inBounds(size, coord);
   });
-}
+};
 
-function allPositions(size) {
+var allPositions = function (size) {
   var range = Immutable.Range(0, size);
   return range.flatMap(function (i) {
     return range.map(function (j) {
       return new Point(i, j);
     });
   });
-}
+};
 
 /*
  * Performs a breadth-first search about an (i,j) position to find recursively
  * orthagonally adjacent stones of the same color (stones with which it shares
  * liberties).
  */
-function getGroup(stones, size, coords) {
+var getGroup = function (stones, size, coords) {
   var color = getStone(stones, coords);
 
-  function search(_x2, _x3, _x4) {
-    var _again = true;
+  var search = function (visited, queue, surrounding) {
+    if (queue.isEmpty()) return { visited: visited, surrounding: surrounding };
 
-    _function: while (_again) {
-      _again = false;
-      var visited = _x2,
-          queue = _x3,
-          surrounding = _x4;
-      stone = neighbors = undefined;
+    var stone = queue.first();
+    queue = queue.shift();
 
-      if (queue.isEmpty()) {
-        return { visited: visited, surrounding: surrounding };
-      }var stone = queue.first();
-      queue = queue.shift();
+    if (visited.has(stone)) return search(visited, queue, surrounding);
 
-      if (visited.has(stone)) {
-        _x2 = visited;
-        _x3 = queue;
-        _x4 = surrounding;
-        _again = true;
-        continue _function;
-      }
+    var neighbors = getAdjacentIntersections(size, stone);
+    neighbors.forEach(function (n) {
+      var state = getStone(stones, n);
+      if (state == color) queue = queue.push(n);else surrounding = surrounding.set(n, state);
+    });
 
-      var neighbors = getAdjacentIntersections(size, stone);
-      neighbors.forEach(function (n) {
-        var state = getStone(stones, n);
-        if (state == color) queue = queue.push(n);else surrounding = surrounding.set(n, state);
-      });
-
-      visited = visited.add(stone);
-      _x2 = visited;
-      _x3 = queue;
-      _x4 = surrounding;
-      _again = true;
-      continue _function;
-    }
-  }
+    visited = visited.add(stone);
+    return search(visited, queue, surrounding);
+  };
 
   var _search = search(Immutable.Set(), Immutable.List([coords]), Immutable.Map());
 
@@ -159,7 +134,7 @@ function getGroup(stones, size, coords) {
 
   return new Group({ stones: visited,
     surrounding: surrounding });
-}
+};
 
 var Board = (function () {
   function Board(size, stones) {
@@ -283,8 +258,7 @@ var Board = (function () {
   return Board;
 })();
 
-function createBoard(size, stones) {
+var createBoard = function (size, stones) {
   return new Board(size, stones);
-}
-
-;
+};
+exports.createBoard = createBoard;

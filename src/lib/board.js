@@ -18,24 +18,21 @@ class Group extends Immutable.Record({stones: null, surrounding: null}) {
   }
 }
 
-function inBounds(size, point) {
-  return point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
-}
+const inBounds = (size, point) =>
+  point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
 
-function getStone(stones, coords) {
-  return stones.get(coords, Constants.EMPTY);
-}
+const getStone = (stones, coords) =>
+  stones.get(coords, Constants.EMPTY);
 
-function replaceStone(stones, coords, value) {
+const replaceStone = (stones, coords, value) => {
   if (value == Constants.EMPTY)
     return removeStone(coords);
   else
     return stones.set(coords, value);
-}
+};
 
-function removeStone(stones, coords) {
-  return stones.remove(coords);
-}
+const removeStone = (stones, coords) =>
+  stones.remove(coords);
 
 const deltas = Immutable.List.of(new Point(-1, 0),
                                  new Point(0, 1),
@@ -47,25 +44,25 @@ const deltas = Immutable.List.of(new Point(-1, 0),
  * Given a board position, returns a list of [i,j] coordinates representing
  * orthagonally adjacent intersections
  */
-function getAdjacentIntersections(size, coords) {
+const getAdjacentIntersections = (size, coords) => {
   const addPair = vec => new Point(vec.i + coords.i, vec.j + coords.j);
   return deltas.map(addPair).filter(coord => inBounds(size, coord));
-}
+};
 
-function allPositions(size) {
+const allPositions = (size) => {
   const range = Immutable.Range(0, size);
   return range.flatMap(i => range.map(j => new Point(i, j)));
-}
+};
 
 /*
  * Performs a breadth-first search about an (i,j) position to find recursively
  * orthagonally adjacent stones of the same color (stones with which it shares
  * liberties).
  */
-function getGroup(stones, size, coords) {
+const getGroup = (stones, size, coords) => {
   const color = getStone(stones, coords);
 
-  function search(visited, queue, surrounding) {
+  const search = (visited, queue, surrounding) => {
     if (queue.isEmpty())
       return {visited: visited, surrounding: surrounding};
 
@@ -86,7 +83,7 @@ function getGroup(stones, size, coords) {
 
     visited = visited.add(stone);
     return search(visited, queue, surrounding);
-  }
+  };
 
   const {visited, surrounding} = search(Immutable.Set(),
                                         Immutable.List([coords]),
@@ -94,7 +91,7 @@ function getGroup(stones, size, coords) {
 
   return new Group({ stones       : visited,
                      surrounding  : surrounding });
-}
+};
 
 class Board {
   constructor(size, stones) {
@@ -192,6 +189,5 @@ class Board {
 
 }
 
-export function createBoard(size, stones) {
-  return new Board(size, stones);
-};
+export const createBoard = (size, stones) =>
+  new Board(size, stones);

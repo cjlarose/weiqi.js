@@ -6,7 +6,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-exports.createGame = createGame;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -107,6 +106,7 @@ var Game = (function () {
   return Game;
 })();
 
-function createGame(boardSize, values) {
+var createGame = function (boardSize, values) {
   return new Game(boardSize, values);
-}
+};
+exports.createGame = createGame;
