@@ -2,88 +2,86 @@ import Immutable from 'immutable';
 import { createBoard } from './board';
 import Constants from './constants';
 
-export function createGame(boardSize, values) {
-  var currentColor, consectutivePasses, history, board;
+function opponentColor(color) {
+  return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
+}
 
-  if (typeof values !== "undefined") {
-    currentColor = values.currentColor;
-    consectutivePasses = values.consectutivePasses;
-    history = values.history;
-    board = values.board;
-  } else {
-    currentColor = Constants.BLACK;
-    consectutivePasses = 0;
-    board = createBoard(boardSize);
-    history = Immutable.Set([board._getStones()]);
-  }
-
-  function opponentColor(color) {
-    return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
-  }
-
-  function inHistory(otherBoard) {
-    return history.has(otherBoard._getStones());
-  }
-
-  var Game = {
-    isOver: function() {
-      return consectutivePasses >= 2;
-    },
-
-    getCurrentPlayer: function() {
-      return currentColor;
-    },
-
-    getBoard: function() {
-      return board;
-    },
-
-    play: function(player, coords) {
-      if (this.isOver())
-        throw "Game is already over";
-
-      if (player != currentColor)
-        throw "Not player's turn";
-
-      var newBoard = board.play(currentColor, coords);
-      if (inHistory(newBoard))
-        throw "Violation of Ko";
-
-      return createGame(boardSize, {
-        currentColor: opponentColor(currentColor),
-        consectutivePasses: 0,
-        board: newBoard,
-        history: history.add(newBoard._getStones())
-      });
-    },
-
-    pass: function(player) {
-      if (this.isOver())
-        throw "Game is already over";
-
-      if (player != currentColor)
-        throw "Not player's turn";
-
-      return createGame(boardSize, {
-        currentColor: opponentColor(currentColor),
-        consectutivePasses: consectutivePasses + 1,
-        board: board,
-        history: history
-      });
-    },
-
-    /*
-     * Returns Black - White
-     */
-    areaScore: function(komi) {
-      if (typeof komi === 'undefined')
-        komi = 0.0;
-
-      var boardScore = board.areaScore();
-      return boardScore[Constants.BLACK] - (boardScore[Constants.WHITE] + komi);
+class Game {
+  constructor(boardSize, values) {
+    if (typeof values !== "undefined") {
+      this.currentColor = values.currentColor;
+      this.consectutivePasses = values.consectutivePasses;
+      this.history = values.history;
+      this.board = values.board;
+    } else {
+      this.currentColor = Constants.BLACK;
+      this.consectutivePasses = 0;
+      this.board = createBoard(boardSize);
+      this.history = Immutable.Set([this.board.stones]);
     }
+  }
 
-  };
+  isOver() {
+    return this.consectutivePasses >= 2;
+  }
 
-  return Object.create(Game);
+  getCurrentPlayer() {
+    return this.currentColor;
+  }
+
+  getBoard() {
+    return this.board;
+  }
+
+  play(player, coords) {
+    const inHistory = (otherBoard) => this.history.has(otherBoard.stones);
+
+    if (this.isOver())
+      throw "Game is already over";
+
+    if (player != this.currentColor)
+      throw "Not player's turn";
+
+    const newBoard = this.board.play(this.currentColor, coords);
+    if (inHistory(newBoard))
+      throw "Violation of Ko";
+
+    return createGame(this.boardSize, {
+      currentColor: opponentColor(this.currentColor),
+      consectutivePasses: 0,
+      board: newBoard,
+      history: this.history.add(newBoard.stones)
+    });
+  }
+
+  pass(player) {
+    if (this.isOver())
+      throw "Game is already over";
+
+    if (player != this.currentColor)
+      throw "Not player's turn";
+
+    return createGame(this.boardSize, {
+      currentColor: opponentColor(this.currentColor),
+      consectutivePasses: this.consectutivePasses + 1,
+      board: this.board,
+      history: this.history
+    });
+  }
+
+  /*
+   * Returns Black - White
+   */
+  areaScore(komi) {
+    if (typeof komi === 'undefined')
+      komi = 0.0;
+
+    const boardScore = this.board.areaScore();
+    return boardScore[Constants.BLACK] - (boardScore[Constants.WHITE] + komi);
+  }
+
+}
+
+export function createGame(boardSize, values) {
+  return new Game(boardSize, values);
 }
