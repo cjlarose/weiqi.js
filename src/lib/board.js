@@ -174,12 +174,10 @@ class Board {
       const groupStones = group.get("stones");
       const surroundingColors = group.get("surrounding").valueSeq().toSet();
 
-      if (state == Constants.EMPTY) {
-        if (surroundingColors.size === 1)
+      if (state === Constants.EMPTY && surroundingColors.size === 1)
           score[surroundingColors.first()] += groupStones.size;
-      } else {
+      else
         score[state] += groupStones.size;
-      }
 
       visited = visited.union(groupStones);
     });

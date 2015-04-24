@@ -241,11 +241,7 @@ var Board = (function () {
           var groupStones = group.get("stones");
           var surroundingColors = group.get("surrounding").valueSeq().toSet();
 
-          if (state == Constants.EMPTY) {
-            if (surroundingColors.size === 1) score[surroundingColors.first()] += groupStones.size;
-          } else {
-            score[state] += groupStones.size;
-          }
+          if (state === Constants.EMPTY && surroundingColors.size === 1) score[surroundingColors.first()] += groupStones.size;else score[state] += groupStones.size;
 
           visited = visited.union(groupStones);
         });
