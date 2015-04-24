@@ -37,10 +37,10 @@ function removeStone(stones, coords) {
   return stones.remove(coords);
 }
 
-var deltas = Immutable.List.of(new Point(-1, 0),
-                               new Point(0, 1),
-                               new Point(1, 0),
-                               new Point(0, -1));
+const deltas = Immutable.List.of(new Point(-1, 0),
+                                 new Point(0, 1),
+                                 new Point(1, 0),
+                                 new Point(0, -1));
 
 
 /*
@@ -48,12 +48,12 @@ var deltas = Immutable.List.of(new Point(-1, 0),
  * orthagonally adjacent intersections
  */
 function getAdjacentIntersections(size, coords) {
-  var addPair = vec => new Point(vec.i + coords.i, vec.j + coords.j);
+  const addPair = vec => new Point(vec.i + coords.i, vec.j + coords.j);
   return deltas.map(addPair).filter(coord => inBounds(size, coord));
 }
 
 function allPositions(size) {
-  var range = Immutable.Range(0, size);
+  const range = Immutable.Range(0, size);
   return range.flatMap(i => range.map(j => new Point(i, j)));
 }
 
@@ -63,21 +63,21 @@ function allPositions(size) {
  * liberties).
  */
 function getGroup(stones, size, coords) {
-  var color = getStone(stones, coords);
+  const color = getStone(stones, coords);
 
   function search(visited, queue, surrounding) {
     if (queue.isEmpty())
       return {visited: visited, surrounding: surrounding};
 
-    var stone = queue.first();
+    const stone = queue.first();
     queue = queue.shift();
 
     if (visited.has(stone))
       return search(visited, queue, surrounding);
 
-    var neighbors = getAdjacentIntersections(size, stone);
+    const neighbors = getAdjacentIntersections(size, stone);
     neighbors.forEach(n => {
-      var state = getStone(stones, n);
+      const state = getStone(stones, n);
       if (state == color)
         queue = queue.push(n);
       else
@@ -88,9 +88,9 @@ function getGroup(stones, size, coords) {
     return search(visited, queue, surrounding);
   }
 
-  var {visited, surrounding} = search(Immutable.Set(),
-                                      Immutable.List([coords]),
-                                      Immutable.Map());
+  const {visited, surrounding} = search(Immutable.Set(),
+                                        Immutable.List([coords]),
+                                        Immutable.Map());
 
   return new Group({ stones       : visited,
                      surrounding  : surrounding });
@@ -121,7 +121,7 @@ class Board {
   }
 
   getIntersections() {
-    var range = Immutable.Range(0, this.size);
+    const range = Immutable.Range(0, this.size);
     return range.map(i =>
       range.map(j => getStone(this.stones, new Point(i, j))).toList()
     ).toList();
@@ -136,21 +136,21 @@ class Board {
     if (getStone(this.stones, coords) != Constants.EMPTY)
       throw "Intersection occupied by existing stone";
 
-    var newBoard = replaceStone(this.stones, coords, color);
-    var neighbors = getAdjacentIntersections(this.size, coords);
-    var neighborColors = Immutable.Map(
+    let newBoard = replaceStone(this.stones, coords, color);
+    const neighbors = getAdjacentIntersections(this.size, coords);
+    const neighborColors = Immutable.Map(
       neighbors.zipWith(n => [n, getStone(newBoard, n)])
     );
-    var isOpponentColor = (stoneColor, _) =>
+    const isOpponentColor = (stoneColor, _) =>
       stoneColor === opponentColor(color);
-    var captured = neighborColors.
+    let captured = neighborColors.
                      filter(isOpponentColor).
                      map((val, coord) => getGroup(newBoard, this.size, coord)).
                      valueSeq().
                      filter(g => g.isDead());
 
     // detect suicide
-    var newGroup = getGroup(newBoard, this.size, coords);
+    const newGroup = getGroup(newBoard, this.size, coords);
     if (captured.isEmpty() && newGroup.isDead())
       captured = Immutable.List([newGroup]);
 
@@ -162,9 +162,9 @@ class Board {
   }
 
   areaScore() {
-    var positions = allPositions(this.size);
-    var visited = Immutable.Set();
-    var score = {};
+    const positions = allPositions(this.size);
+    let visited = Immutable.Set();
+    const score = {};
     score[Constants.BLACK] = 0;
     score[Constants.WHITE] = 0;
 
@@ -172,10 +172,10 @@ class Board {
       if (visited.has(coords))
         return;
 
-      var state = getStone(this.stones, coords);
-      var group = getGroup(this.stones, this.size, coords);
-      var groupStones = group.get("stones");
-      var surroundingColors = group.get("surrounding").valueSeq().toSet();
+      const state = getStone(this.stones, coords);
+      const group = getGroup(this.stones, this.size, coords);
+      const groupStones = group.get("stones");
+      const surroundingColors = group.get("surrounding").valueSeq().toSet();
 
       if (state == Constants.EMPTY) {
         if (surroundingColors.size === 1)
