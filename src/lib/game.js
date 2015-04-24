@@ -1,10 +1,7 @@
-import Immutable from 'immutable';
-import { createBoard } from './board';
-import Constants from './constants';
-
-function opponentColor(color) {
-  return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
-}
+import Immutable from "immutable";
+import { createBoard } from "./board";
+import { opponentColor } from "./util";
+import Constants from "./constants";
 
 class Game {
   constructor(boardSize, values) {
@@ -73,7 +70,7 @@ class Game {
    * Returns Black - White
    */
   areaScore(komi) {
-    if (typeof komi === 'undefined')
+    if (typeof komi === "undefined")
       komi = 0.0;
 
     const boardScore = this.board.areaScore();
@@ -82,6 +79,5 @@ class Game {
 
 }
 
-export function createGame(boardSize, values) {
-  return new Game(boardSize, values);
-}
+export const createGame = (boardSize, values) =>
+  new Game(boardSize, values);

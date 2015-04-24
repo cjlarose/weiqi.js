@@ -6,7 +6,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-exports.createGame = createGame;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -15,11 +14,9 @@ var Immutable = _interopRequire(require("immutable"));
 
 var createBoard = require("./board").createBoard;
 
-var Constants = _interopRequire(require("./constants"));
+var opponentColor = require("./util").opponentColor;
 
-function opponentColor(color) {
-  return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
-}
+var Constants = _interopRequire(require("./constants"));
 
 var Game = (function () {
   function Game(boardSize, values) {
@@ -109,6 +106,7 @@ var Game = (function () {
   return Game;
 })();
 
-function createGame(boardSize, values) {
+var createGame = function (boardSize, values) {
   return new Game(boardSize, values);
-}
+};
+exports.createGame = createGame;
