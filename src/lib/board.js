@@ -1,6 +1,6 @@
-import Immutable from 'immutable';
-import { opponentColor } from './util';
-import Constants from './constants';
+import Immutable from "immutable";
+import { opponentColor } from "./util";
+import Constants from "./constants";
 
 class Point extends Immutable.Record({i: 0, j: 0}) {
   constructor(i, j) {
@@ -28,9 +28,13 @@ function getStone(stones, coords) {
 
 function replaceStone(stones, coords, value) {
   if (value == Constants.EMPTY)
-    return stones.remove(coords)
+    return removeStone(coords);
   else
     return stones.set(coords, value);
+}
+
+function removeStone(stones, coords) {
+  return stones.remove(coords);
 }
 
 var deltas = Immutable.List.of(new Point(-1, 0),
@@ -134,8 +138,11 @@ class Board {
 
     var newBoard = replaceStone(this.stones, coords, color);
     var neighbors = getAdjacentIntersections(this.size, coords);
-    var neighborColors = Immutable.Map(neighbors.zipWith(n => [n, getStone(newBoard, n)]));
-    var isOpponentColor = (stoneColor, _) => stoneColor === opponentColor(color);
+    var neighborColors = Immutable.Map(
+      neighbors.zipWith(n => [n, getStone(newBoard, n)])
+    );
+    var isOpponentColor = (stoneColor, _) =>
+      stoneColor === opponentColor(color);
     var captured = neighborColors
       .filter(isOpponentColor)
       .map((val, coord) => getGroup(newBoard, this.size, coord))
@@ -148,8 +155,8 @@ class Board {
       captured = Immutable.List([newGroup]);
 
     newBoard = captured
-      .flatMap(g => g.get('stones'))
-      .reduce((acc, stone) => replaceStone(acc, stone, Constants.EMPTY), newBoard);
+      .flatMap(g => g.get("stones"))
+      .reduce((acc, stone) => removeStone(acc, stone), newBoard);
 
     return createBoard(this.size, newBoard);
   }
@@ -167,8 +174,8 @@ class Board {
 
       var state = getStone(this.stones, coords);
       var group = getGroup(this.stones, this.size, coords);
-      var groupStones = group.get('stones');
-      var surroundingColors = group.get('surrounding').valueSeq().toSet();
+      var groupStones = group.get("stones");
+      var surroundingColors = group.get("surrounding").valueSeq().toSet();
 
       if (state == Constants.EMPTY) {
         if (surroundingColors.size === 1)

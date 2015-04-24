@@ -1,7 +1,7 @@
-import Immutable from 'immutable';
-import { createBoard } from './board';
-import { opponentColor } from './util';
-import Constants from './constants';
+import Immutable from "immutable";
+import { createBoard } from "./board";
+import { opponentColor } from "./util";
+import Constants from "./constants";
 
 class Game {
   constructor(boardSize, values) {
@@ -70,7 +70,7 @@ class Game {
    * Returns Black - White
    */
   areaScore(komi) {
-    if (typeof komi === 'undefined')
+    if (typeof komi === "undefined")
       komi = 0.0;
 
     const boardScore = this.board.areaScore();

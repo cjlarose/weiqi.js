@@ -72,10 +72,14 @@ function getStone(stones, coords) {
 
 function replaceStone(stones, coords, value) {
   if (value == Constants.EMPTY) {
-    return stones.remove(coords);
+    return removeStone(coords);
   } else {
     return stones.set(coords, value);
   }
+}
+
+function removeStone(stones, coords) {
+  return stones.remove(coords);
 }
 
 var deltas = Immutable.List.of(new Point(-1, 0), new Point(0, 1), new Point(1, 0), new Point(0, -1));
@@ -238,7 +242,7 @@ var Board = (function () {
         newBoard = captured.flatMap(function (g) {
           return g.get("stones");
         }).reduce(function (acc, stone) {
-          return replaceStone(acc, stone, Constants.EMPTY);
+          return removeStone(acc, stone);
         }, newBoard);
 
         return createBoard(this.size, newBoard);
