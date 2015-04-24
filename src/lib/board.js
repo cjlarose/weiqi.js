@@ -143,20 +143,20 @@ class Board {
     );
     var isOpponentColor = (stoneColor, _) =>
       stoneColor === opponentColor(color);
-    var captured = neighborColors
-      .filter(isOpponentColor)
-      .map((val, coord) => getGroup(newBoard, this.size, coord))
-      .valueSeq()
-      .filter(g => g.isDead());
+    var captured = neighborColors.
+                     filter(isOpponentColor).
+                     map((val, coord) => getGroup(newBoard, this.size, coord)).
+                     valueSeq().
+                     filter(g => g.isDead());
 
     // detect suicide
     var newGroup = getGroup(newBoard, this.size, coords);
     if (captured.isEmpty() && newGroup.isDead())
       captured = Immutable.List([newGroup]);
 
-    newBoard = captured
-      .flatMap(g => g.get("stones"))
-      .reduce((acc, stone) => removeStone(acc, stone), newBoard);
+    newBoard = captured.
+                 flatMap(g => g.get("stones")).
+                 reduce((acc, stone) => removeStone(acc, stone), newBoard);
 
     return createBoard(this.size, newBoard);
   }
