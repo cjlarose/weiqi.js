@@ -79,6 +79,5 @@ class Game {
 
 }
 
-export const createGame = (boardSize, values) => {
-  return new Game(boardSize, values);
-};
+export const createGame = (boardSize, values) =>
+  new Game(boardSize, values);

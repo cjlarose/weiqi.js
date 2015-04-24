@@ -1,5 +1,4 @@
 import Constants from "./constants";
 
-export function opponentColor(color) {
-  return color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
-}
+export const opponentColor = (color) =>
+  color == Constants.BLACK ? Constants.WHITE : Constants.BLACK;
