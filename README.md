@@ -40,9 +40,9 @@ be in a state in which it has been previously.
 
 [5]: http://senseis.xmp.net/?Superko
 
-To see where all the stones are, use `game.getBoard().getIntersections()`. This returns an [`Immutable.Seq`][6] of [`Immutable.Seq`][6]s.
+To see where all the stones are, use `game.getBoard().getIntersections()`. This returns an [`Immutable.List`][6] of [`Immutable.List`][6]s.
 
-[6]: http://facebook.github.io/immutable-js/docs/#/Seq
+[6]: http://facebook.github.io/immutable-js/docs/#/List
 
 ```javascript
 > game.getBoard().getIntersections()
