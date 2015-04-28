@@ -23,22 +23,63 @@ browser with tools like [browserify][4].
 **Note: This library's API is still unstable. There will be breaking API
 changes in future releases.**
 
-## Playing a game
+## Usage
+
+### Creating a game
 
 ```javascript
 var Weiqi = require('weiqi');
-var game = Weiqi.createGame(9)            // creates a game with a 9 x 9 board
-                .play(Weiqi.BLACK, [2,2]) // positions are 0-indexed. Black plays at the 3-3 point.
-                .play(Weiqi.WHITE, [6,6]) // white plays at the 7-7 corner.
-                .pass(Weiqi.BLACK)        // black passes
-                .pass(Weiqi.WHITE);       // white passes
+var game = Weiqi.createGame(9);  // creates a game on a 9 x 9 board
+game = Weiqi.createGame(13);  // creates a game on a 13 x 13 board
+game = Weiqi.createGame(19);  // creates a game on a 19 x 19 board
 ```
 
-`Weiqi.Game` handles captures appropriately. It forbids the same color playing twice.
-It enforces [positional superko][5]--at the end of any turn, the board cannot
-be in a state in which it has been previously.
+### Playing a game
+
+```javascript
+var Weiqi = require('weiqi');
+var game = Weiqi.createGame(9)
+                .play(Weiqi.BLACK, [2,2])
+                .play(Weiqi.WHITE, [6,7])
+                .pass(Weiqi.BLACK)  // black passes
+                .pass(Weiqi.WHITE); // white passes
+```
+
+`Game.play` and `Game.pass` each take a player identifier (`Weiqi.BLACK` or `Weiqi.WHITE`). `Game.play` takes an additional zero-indexed array of size two that indicates the position to place a stone. `Game.play` will raise exceptions for the following situations:
+* the game is already over (there have already been two consecutive passes)
+* it is not currently the turn of the player who is attempting to play
+* the move violates [positional superko][5] (at the end of any turn, the board cannot
+be in a state in which it has been previously).
 
 [5]: http://senseis.xmp.net/?Superko
+
+### Querying the game
+
+`getCurrentPlayer` returns either `Weiqi.BLACK` or `Weiqi.WHITE`. The example below shows that `Weiqi.WHITE === "o"`, but don't depend on that always being true. Always perform comparisons to `Weiqi.BLACK` and `Weiqi.WHITE`.
+
+```javascript
+> var Weiqi = require('weiqi');
+> var game = Weiqi.createGame(9)
+                .play(Weiqi.BLACK, [2,2]);
+> game.getCurrentPlayer();
+"o"
+```
+
+`isOver` returns true iff there have been two consecutive passes.
+
+```javascript
+> var Weiqi = require('weiqi');
+> var game = Weiqi.createGame(9)
+                .play(Weiqi.BLACK, [2,2]);
+> game.isOver();
+false
+> game = game.pass(Weiqi.WHITE);
+> game.isOver();
+false
+> game = game.pass(Weiqi.BLACK);
+> game.isOver();
+true
+```
 
 To see where all the stones are, use `game.getBoard().getIntersections()`. This returns an [`Immutable.List`][6] of [`Immutable.List`][6]s.
 
