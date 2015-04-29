@@ -1,10 +1,20 @@
 SOURCEDIR := src
-DISTDIR := dist
+BROWSERDIR := dist-browser
+NODEDIR := dist
 SOURCES := $(shell find $(SOURCEDIR) -name '*.js')
-TRANSPILED := $(patsubst $(SOURCEDIR)/%, $(DISTDIR)/%, $(SOURCES))
+TRANSPILED := $(patsubst $(SOURCEDIR)/%, $(NODEDIR)/%, $(SOURCES))
+
+all: $(BROWSERDIR)/weiqi.js $(TRANSPILED)
+
+$(BROWSERDIR)/weiqi.js:
+	./node_modules/.bin/browserify src/exports.js -t babelify -o $@
 
 $(TRANSPILED): $(SOURCES)
-	./node_modules/.bin/babel $(SOURCEDIR) --out-dir $(DISTDIR)
+	./node_modules/.bin/babel $(SOURCEDIR) --out-dir $(NODEDIR)
 
 test: $(TRANSPILED)
 	./node_modules/.bin/mocha --reporter spec
+
+.PHONY: clean
+clean:
+	rm -f $(TRANSPILED) $(BROWSERDIR)/weiqi.js
