@@ -15,7 +15,10 @@ explore possible future responses (such as for AI decision-making).
 [2]: http://en.wikipedia.org/wiki/Persistent_data_structure
 
 The library is available as an [`npm` package][3], and can be used in the
-browser with tools like [browserify][4].
+browser with tools like [browserify][4]. If you don't want to use browserify,
+there is a pre-built file in the `dist-browser` directory that you can include
+in your browser-targeted projects right away. Access `Weiqi` with the global
+`Weiqi` variable in this case.
 
 [3]: https://www.npmjs.com/package/weiqi
 [4]: http://browserify.org/
