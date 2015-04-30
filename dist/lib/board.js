@@ -136,6 +136,10 @@ var getGroup = function (stones, size, coords) {
     surrounding: surrounding });
 };
 
+var createEmptyGrid = function (size) {
+  return Immutable.Repeat(Immutable.Repeat(Constants.EMPTY, size).toList(), size).toList();
+};
+
 var Board = (function () {
   function Board(size, stones) {
     _classCallCheck(this, Board);
@@ -146,6 +150,7 @@ var Board = (function () {
 
     this.size = size;
     this.stones = stones;
+    this._empty_grid = createEmptyGrid(size);
   }
 
   _createClass(Board, {
@@ -178,12 +183,12 @@ var Board = (function () {
       value: function getIntersections() {
         var _this = this;
 
-        var range = Immutable.Range(0, this.size);
-        return range.map(function (i) {
-          return range.map(function (j) {
-            return getStone(_this.stones, new Point(i, j));
-          }).toList();
-        }).toList();
+        var mergeStones = function (map) {
+          return _this.stones.reduce(function (board, color, point) {
+            return board.setIn([point.i, point.j], color);
+          }, map);
+        };
+        return this._empty_grid.withMutations(mergeStones);
       }
     },
     play: {
