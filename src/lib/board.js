@@ -93,6 +93,17 @@ const getGroup = (stones, size, coords) => {
                      surrounding  : surrounding });
 };
 
+const createEmptyGrid = (() => {
+  const createGrid = (size) =>
+    Immutable.Repeat(
+      Immutable.Repeat(Constants.EMPTY, size).toList(),
+      size
+    ).toList();
+
+  const cache = {};
+  return (size) => cache[size] || (cache[size] = createGrid(size));
+})();
+
 class Board {
   constructor(size, stones) {
     if (typeof size === "undefined" || size < 0)
@@ -118,10 +129,12 @@ class Board {
   }
 
   getIntersections() {
-    const range = Immutable.Range(0, this.size);
-    return range.map(i =>
-      range.map(j => getStone(this.stones, new Point(i, j))).toList()
-    ).toList();
+    const mergeStones = map =>
+      this.stones.reduce(
+        (board, color, point) =>
+          board.setIn([point.i, point.j], color),
+        map);
+    return createEmptyGrid(this.size).withMutations(mergeStones);
   }
 
   play(color, coords) {
