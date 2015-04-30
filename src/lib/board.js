@@ -93,12 +93,16 @@ const getGroup = (stones, size, coords) => {
                      surrounding  : surrounding });
 };
 
-const createEmptyGrid = (size) =>
-  Immutable.Repeat(
-    Immutable.Repeat(Constants.EMPTY, size).toList(),
-    size
-  ).toList();
+const createEmptyGrid = (() => {
+  const createGrid = (size) =>
+    Immutable.Repeat(
+      Immutable.Repeat(Constants.EMPTY, size).toList(),
+      size
+    ).toList();
 
+  const cache = {};
+  return (size) => cache[size] || (cache[size] = createGrid(size));
+})();
 
 class Board {
   constructor(size, stones) {
@@ -110,7 +114,6 @@ class Board {
 
     this.size = size;
     this.stones = stones;
-    this._empty_grid = createEmptyGrid(size);
   }
 
   getStone(coords) {
@@ -131,7 +134,7 @@ class Board {
         (board, color, point) =>
           board.setIn([point.i, point.j], color),
         map);
-    return this._empty_grid.withMutations(mergeStones);
+    return createEmptyGrid(this.size).withMutations(mergeStones);
   }
 
   play(color, coords) {

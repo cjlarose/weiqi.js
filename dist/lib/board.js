@@ -136,9 +136,16 @@ var getGroup = function (stones, size, coords) {
     surrounding: surrounding });
 };
 
-var createEmptyGrid = function (size) {
-  return Immutable.Repeat(Immutable.Repeat(Constants.EMPTY, size).toList(), size).toList();
-};
+var createEmptyGrid = (function () {
+  var createGrid = function (size) {
+    return Immutable.Repeat(Immutable.Repeat(Constants.EMPTY, size).toList(), size).toList();
+  };
+
+  var cache = {};
+  return function (size) {
+    return cache[size] || (cache[size] = createGrid(size));
+  };
+})();
 
 var Board = (function () {
   function Board(size, stones) {
@@ -150,7 +157,6 @@ var Board = (function () {
 
     this.size = size;
     this.stones = stones;
-    this._empty_grid = createEmptyGrid(size);
   }
 
   _createClass(Board, {
@@ -188,7 +194,7 @@ var Board = (function () {
             return board.setIn([point.i, point.j], color);
           }, map);
         };
-        return this._empty_grid.withMutations(mergeStones);
+        return createEmptyGrid(this.size).withMutations(mergeStones);
       }
     },
     play: {
