@@ -4,6 +4,7 @@ NODEDIR := dist
 SOURCES := $(shell find $(SOURCEDIR) -name '*.js')
 TRANSPILED := $(patsubst $(SOURCEDIR)/%, $(NODEDIR)/%, $(SOURCES))
 
+.PHONY: all
 all: $(BROWSERDIR)/weiqi.js $(TRANSPILED)
 
 $(BROWSERDIR)/weiqi.js:
@@ -12,6 +13,7 @@ $(BROWSERDIR)/weiqi.js:
 $(TRANSPILED): $(SOURCES)
 	./node_modules/.bin/babel $(SOURCEDIR) --out-dir $(NODEDIR)
 
+.PHONY: test
 test: $(TRANSPILED)
 	./node_modules/.bin/mocha --reporter spec
 
