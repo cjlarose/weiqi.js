@@ -1,83 +1,65 @@
-import Immutable from "immutable";
-import { createBoard } from "./board";
-import { opponentColor } from "./util";
-import Constants from "./constants";
+import Immutable from 'immutable';
+import { Move, Position } from './records';
+import { createBoard, placeStone, areaScore as boardAreaScore } from './board';
+import { opponentColor } from './util';
 
-class Game {
-  constructor(boardSize, values) {
-    if (typeof values !== "undefined") {
-      this.currentColor = values.currentColor;
-      this.consectutivePasses = values.consectutivePasses;
-      this.history = values.history;
-      this.board = values.board;
-    } else {
-      this.currentColor = Constants.BLACK;
-      this.consectutivePasses = 0;
-      this.board = createBoard(boardSize);
-      this.history = Immutable.Set([this.board.stones]);
-    }
-  }
-
-  isOver() {
-    return this.consectutivePasses >= 2;
-  }
-
-  getCurrentPlayer() {
-    return this.currentColor;
-  }
-
-  getBoard() {
-    return this.board;
-  }
-
-  play(player, coords) {
-    const inHistory = (otherBoard) => this.history.has(otherBoard.stones);
-
-    if (this.isOver())
-      throw "Game is already over";
-
-    if (player != this.currentColor)
-      throw "Not player's turn";
-
-    const newBoard = this.board.play(this.currentColor, coords);
-    if (inHistory(newBoard))
-      throw "Violation of Ko";
-
-    return createGame(this.boardSize, {
-      currentColor: opponentColor(this.currentColor),
-      consectutivePasses: 0,
-      board: newBoard,
-      history: this.history.add(newBoard.stones)
-    });
-  }
-
-  pass(player) {
-    if (this.isOver())
-      throw "Game is already over";
-
-    if (player != this.currentColor)
-      throw "Not player's turn";
-
-    return createGame(this.boardSize, {
-      currentColor: opponentColor(this.currentColor),
-      consectutivePasses: this.consectutivePasses + 1,
-      board: this.board,
-      history: this.history
-    });
-  }
-
-  /*
-   * Returns Black - White
-   */
-  areaScore(komi) {
-    if (typeof komi === "undefined")
-      komi = 0.0;
-
-    const boardScore = this.board.areaScore();
-    return boardScore[Constants.BLACK] - (boardScore[Constants.WHITE] + komi);
-  }
-
+export function createGame(boardSize) {
+  const board = createBoard(boardSize);
+  return new Immutable.Map({
+    board,
+    currentPlayer: 'black',
+    consectutivePasses: 0,
+    history: new Immutable.Set(board.get('stones')),
+  });
 }
 
-export const createGame = (boardSize, values) =>
-  new Game(boardSize, values);
+export function isOver(game) {
+  return game.get('consectutivePasses') >= 2;
+}
+
+export function play(game, player, position) {
+  let move;
+  if (position) {
+    const [i, j] = position;
+    move = new Move({ position: new Position({ i, j }), stoneColor: player });
+  } else {
+    move = new Move({ position: null, stoneColor: player });
+  }
+
+  const inHistory = otherBoard => game.get('history').has(otherBoard.get('stones'));
+
+  if (isOver(game)) {
+    throw new Error('Game is already over');
+  }
+
+  if (player !== game.get('currentPlayer')) {
+    throw new Error("Not player's turn");
+  }
+
+  if (move.get('position') === null) {
+    return game
+      .update('currentPlayer', opponentColor)
+      .update('consectutivePasses', p => p + 1);
+  }
+
+  const newBoard = placeStone(game.get('board'), move);
+
+  if (inHistory(newBoard)) {
+    throw new Error('Violation of Ko');
+  }
+
+  return game
+    .update('currentPlayer', opponentColor)
+    .set('consectutivePasses', 0)
+    .set('board', newBoard)
+    .update('history', h => h.add(newBoard.get('stones')));
+}
+
+export function pass(game, player) {
+  return play(game, player, null);
+}
+
+export function areaScore(game, komi = 0.0) {
+  const boardScore = boardAreaScore(game.get('board'));
+  return boardScore.black - (boardScore.white + komi);
+}

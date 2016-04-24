@@ -1,17 +1,15 @@
-"use strict";
+'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var createGame = require("./lib/game").createGame;
+var _game = require('./lib/game');
 
-var createBoard = require("./lib/board").createBoard;
-
-var Constants = _interopRequire(require("./lib/constants"));
-
-module.exports = {
-  createGame: createGame,
-  createBoard: createBoard,
-  EMPTY: Constants.EMPTY,
-  BLACK: Constants.BLACK,
-  WHITE: Constants.WHITE
+exports.default = {
+  createGame: _game.createGame,
+  isOver: _game.isOver,
+  play: _game.play,
+  pass: _game.pass,
+  areaScore: _game.areaScore
 };

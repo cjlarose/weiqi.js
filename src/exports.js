@@ -1,4 +1,6 @@
+/* global window */
 import Weiqi from './index';
 
-if (typeof(window) !== "undefined")
+if (typeof (window) !== 'undefined') {
   window.Weiqi = Weiqi;
+}
