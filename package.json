@@ -19,10 +19,7 @@
     "game"
   ],
   "author": "Chris LaRose <cjlarose@gmail.com> (http://cjlarose.com/)",
-  "license": {
-    "type": "ISC",
-    "url": "https://github.com/cjlarose/weiqi.js/blob/master/LICENSE-ISC.txt"
-  },
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/cjlarose/weiqi.js/issues"
   },
