@@ -1,135 +1,132 @@
 var assert = require('assert');
-var Weiqi = require('../dist/index.js');
+var Weiqi = require('../dist/index.js').default;
+
+function playMoves(initialGame, moves) {
+  return moves.reduce(function(game, move) {
+    if (move[1]) {
+      return Weiqi.play(game, move[0], move[1]);
+    }
+    return Weiqi.pass(game, move[0]);
+  }, initialGame);
+}
 
 describe("Game", function() {
   describe('#createGame', function() {
     it('started with black player', function() {
       var game = Weiqi.createGame(9);
-      assert.equal(Weiqi.BLACK, game.getCurrentPlayer());
-      assert.equal(false, game.isOver());
+      assert.equal('black', game.get('currentPlayer'));
+      assert.equal(false, Weiqi.isOver(game));
     });
   });
 
   describe('#pass', function() {
     it('ends the game with two consectutive passes', function() {
-      var game = Weiqi.createGame(9)
-        .pass(Weiqi.BLACK);
+      var game = Weiqi.pass(Weiqi.createGame(9), 'black')
 
-      assert.equal(Weiqi.WHITE, game.getCurrentPlayer());
+      assert.equal('white', game.get('currentPlayer'));
 
-      game = game.pass(Weiqi.WHITE);
-      assert(game.isOver());
+      game = Weiqi.pass(game, 'white');
+      assert(Weiqi.isOver(game));
 
-      var fn = function() {game.pass(Weiqi.BLACK);};
-      assert.throws(fn, /^Game is already over$/);
+      var fn = function() { Weiqi.pass(game, 'black'); };
+      assert.throws(fn, /Game is already over/);
     });
 
     it('forbids play of same player twice', function() {
-      var game = Weiqi.createGame(9).pass(Weiqi.BLACK);
-      assert.equal(Weiqi.WHITE, game.getCurrentPlayer());
+      var game = Weiqi.pass(Weiqi.createGame(9), 'black');
+      assert.equal('white', game.get('currentPlayer'));
 
-      var fn = function() {game.pass(Weiqi.BLACK);};
-      assert.throws(fn, /^Not player's turn$/);
+      var fn = function() { Weiqi.pass(game, 'black'); };
+      assert.throws(fn, /Not player's turn/);
     });
   });
 
   describe("#play", function() {
     it('forbids play on completed game', function() {
-      var game = Weiqi.createGame(9)
-        .pass(Weiqi.BLACK)
-        .pass(Weiqi.WHITE);
-      assert(game.isOver());
+      var game = Weiqi.pass(Weiqi.pass(Weiqi.createGame(9), 'black'), 'white');
+      assert(Weiqi.isOver(game));
 
-      var fn = function() {game.play(Weiqi.BLACK, [0, 0]);};
-      assert.throws(fn, /^Game is already over$/);
+      var fn = function() { Weiqi.play(game, 'black', [0, 0]); }
+      assert.throws(fn, /Game is already over/);
     });
 
     it('forbids play of same player twice', function() {
-      var game = Weiqi.createGame(9)
-        .play(Weiqi.BLACK, [0, 0]);
-      assert.equal(Weiqi.WHITE, game.getCurrentPlayer());
+      var game = Weiqi.play(Weiqi.createGame(9), 'black', [0, 0]);
+      assert.equal('white', game.get('currentPlayer'));
 
-      var fn = function() {game.play(Weiqi.BLACK, [0, 0]);};
-      assert.throws(fn, /^Not player's turn$/);
+      var fn = function() { Weiqi.play(game, 'black', [0, 0]); }
+      assert.throws(fn, /Not player's turn/);
     });
 
     it('forbids simple ko', function() {
-      var game = Weiqi.createGame(4)
-                   .play(Weiqi.BLACK, [0, 1])
-                   .play(Weiqi.WHITE, [0, 2])
-                   .play(Weiqi.BLACK, [1, 2])
-                   .play(Weiqi.WHITE, [1, 3])
-                   .play(Weiqi.BLACK, [2, 1])
-                   .play(Weiqi.WHITE, [2, 2])
-                   .play(Weiqi.BLACK, [1, 0])
-                   .play(Weiqi.WHITE, [1, 1]);
-      var fn = function() {game.play(Weiqi.BLACK, [1, 2]);};
-      assert.throws(fn, /^Violation of Ko$/);
+      var moves = [
+        ['black', [0, 1]],
+        ['white', [0, 2]],
+        ['black', [1, 2]],
+        ['white', [1, 3]],
+        ['black', [2, 1]],
+        ['white', [2, 2]],
+        ['black', [1, 0]],
+        ['white', [1, 1]],
+      ];
+      var game = playMoves(Weiqi.createGame(4), moves);
+      var fn = function() { Weiqi.play(game, 'black', [1, 2]); }
+      assert.throws(fn, /Violation of Ko/);
     });
 
     it('forbids complex ko', function() {
       // Example from http://senseis.xmp.net/?Superko
       // setup
-      var game = Weiqi.createGame(4)
-                   .play(Weiqi.BLACK, [0, 3])
-                   .play(Weiqi.WHITE, [1, 0])
-                   .play(Weiqi.BLACK, [1, 1])
-                   .pass(Weiqi.WHITE)
-                   .play(Weiqi.BLACK, [1, 2])
-                   .pass(Weiqi.WHITE)
-                   .play(Weiqi.BLACK, [1, 3]);
+      var moves = [
+        ['black', [0, 3]],
+        ['white', [1, 0]],
+        ['black', [1, 1]],
+        ['white', null],
+        ['black', [1, 2]],
+        ['white', null],
+        ['black', [1, 3]],
+      ];
+      var game = playMoves(Weiqi.createGame(4), moves);
 
       // white plays, putting board into valid state
       // black captures
-      game = game.play(Weiqi.WHITE, [0, 1])
-               .pass(Weiqi.BLACK)
-               .play(Weiqi.WHITE, [0, 2])
-               .play(Weiqi.BLACK, [0, 0]);
+      moves = [
+        ['white', [0, 1]],
+        ['black', null],
+        ['white', [0, 2]],
+        ['black', [0, 0]],
+      ];
+      game = playMoves(game, moves);
 
       // white cannot retake
-      var fn = function() {game.play(Weiqi.WHITE, [0, 1]);};
-      assert.throws(fn, /^Violation of Ko$/);
+      var fn = function() { Weiqi.play(game, 'white', [0, 1]); }
+      assert.throws(fn, /Violation of Ko/);
     });
   });
 
-  describe('#areaSore', function() {
+  describe('#areaScore', function() {
+    var moves = [
+      ['black', [0, 1]],
+      ['white', [0, 2]],
+      ['black', [1, 0]],
+      ['white', [1, 2]],
+      ['black', [1, 1]],
+      ['white', [2, 0]],
+      ['black', null],
+      ['white', [2, 1]],
+    ];
+    var game = playMoves(Weiqi.createGame(4), moves);
+
     it('returns the difference between black and white\'s scores', function() {
-      var game = Weiqi.createGame(4)
-                   .play(Weiqi.BLACK, [0, 1])
-                   .play(Weiqi.WHITE, [0, 2])
-                   .play(Weiqi.BLACK, [1, 0])
-                   .play(Weiqi.WHITE, [1, 2])
-                   .play(Weiqi.BLACK, [1, 1])
-                   .play(Weiqi.WHITE, [2, 0])
-                   .pass(Weiqi.BLACK)
-                   .play(Weiqi.WHITE, [2, 1]);
-      assert.equal(4 - 12, game.areaScore(0));
+      assert.equal(4 - 12, Weiqi.areaScore(game, 0));
     });
 
     it('defaults to komi of 0', function() {
-      var game = Weiqi.createGame(4)
-                   .play(Weiqi.BLACK, [0, 1])
-                   .play(Weiqi.WHITE, [0, 2])
-                   .play(Weiqi.BLACK, [1, 0])
-                   .play(Weiqi.WHITE, [1, 2])
-                   .play(Weiqi.BLACK, [1, 1])
-                   .play(Weiqi.WHITE, [2, 0])
-                   .pass(Weiqi.BLACK)
-                   .play(Weiqi.WHITE, [2, 1]);
-      assert.equal(4 - 12, game.areaScore());
+      assert.equal(4 - 12, Weiqi.areaScore(game));
     });
 
     it('adds komi to white\'s score', function() {
-      var game = Weiqi.createGame(4)
-                   .play(Weiqi.BLACK, [0, 1])
-                   .play(Weiqi.WHITE, [0, 2])
-                   .play(Weiqi.BLACK, [1, 0])
-                   .play(Weiqi.WHITE, [1, 2])
-                   .play(Weiqi.BLACK, [1, 1])
-                   .play(Weiqi.WHITE, [2, 0])
-                   .pass(Weiqi.BLACK)
-                   .play(Weiqi.WHITE, [2, 1]);
-      assert.equal(4 - (12 + 0.5), game.areaScore(0.5));
+      assert.equal(4 - (12 + 0.5), Weiqi.areaScore(game, 0.5));
     });
   });
 });

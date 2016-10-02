@@ -1,204 +1,168 @@
-import Immutable from "immutable";
-import { opponentColor } from "./util";
-import Constants from "./constants";
+import Immutable from 'immutable';
+import { Position, Group } from './records';
 
-class Point extends Immutable.Record({i: 0, j: 0}) {
-  constructor(i, j) {
-    super({i: i, j: j});
-  }
+function positionInBounds(size, position) {
+  const i = position.get('i');
+  const j = position.get('j');
+  return i >= 0 && i < size && j >= 0 && j < size;
 }
 
-class Group extends Immutable.Record({stones: null, surrounding: null}) {
-  isDead() {
-    return this.getLiberties().isEmpty();
-  }
-
-  getLiberties() {
-    return this.surrounding.filter(color => color === Constants.EMPTY);
-  }
+function addPositions(a, b) {
+  return new Position({ i: a.get('i') + b.get('i'),
+                        j: a.get('j') + b.get('j') });
 }
 
-const inBounds = (size, point) =>
-  point.i >= 0 && point.i < size && point.j >= 0 && point.j < size;
+const deltas = [new Position({ i: 1, j: 0 }),
+                new Position({ i: 0, j: 1 }),
+                new Position({ i: -1, j: 0 }),
+                new Position({ i: 0, j: -1 })];
 
-const getStone = (stones, coords) =>
-  stones.get(coords, Constants.EMPTY);
+function getNeighbors(size, position) {
+  return deltas.map(d => addPositions(position, d)).filter(p => positionInBounds(size, p));
+}
 
-const replaceStone = (stones, coords, value) => {
-  if (value === Constants.EMPTY)
-    return removeStone(coords);
-  else
-    return stones.set(coords, value);
-};
+function removeGroup(board, group) {
+  return group.get('stones').reduce((b, p) => b.delete(p), board);
+}
 
-const removeStone = (stones, coords) =>
-  stones.remove(coords);
+function groupAtPosition(size, board, position) {
+  const color = board.get(position);
 
-const deltas = Immutable.List.of(new Point(-1, 0),
-                                 new Point(0, 1),
-                                 new Point(1, 0),
-                                 new Point(0, -1));
+  const search = (group, queue, visited) => {
+    if (queue.isEmpty()) { return group; }
 
+    const pos = queue.first();
+    if (visited.has(pos)) { return search(group, queue.shift(), visited); }
 
-/*
- * Given a board position, returns a list of [i,j] coordinates representing
- * orthagonally adjacent intersections
- */
-const getAdjacentIntersections = (size, coords) => {
-  const addPair = vec => new Point(vec.i + coords.i, vec.j + coords.j);
-  return deltas.map(addPair).filter(coord => inBounds(size, coord));
-};
+    if (color === board.get(pos)) {
+      const newGroup = new Group({ stones: group.get('stones').add(pos),
+                                   liberties: group.get('liberties') });
+      const newQueue = queue.shift().concat(getNeighbors(size, pos));
+      return search(newGroup, newQueue, visited.add(pos));
+    }
 
-const allPositions = (size) => {
-  const range = Immutable.Range(0, size);
-  return range.flatMap(i => range.map(j => new Point(i, j)));
-};
+    if (!board.has(pos)) {
+      const newGroup = new Group({ stones: group.get('stones'),
+                                   liberties: group.get('liberties').add(pos) });
+      return search(newGroup, queue.shift(), visited.add(pos));
+    }
 
-/*
- * Performs a breadth-first search about an (i,j) position to find recursively
- * orthagonally adjacent stones of the same color (stones with which it shares
- * liberties).
- */
-const getGroup = (stones, size, coords) => {
-  const color = getStone(stones, coords);
-
-  const search = (visited, queue, surrounding) => {
-    if (queue.isEmpty())
-      return {visited: visited, surrounding: surrounding};
-
-    const stone = queue.first();
-    queue = queue.shift();
-
-    if (visited.has(stone))
-      return search(visited, queue, surrounding);
-
-    const neighbors = getAdjacentIntersections(size, stone);
-    neighbors.forEach(n => {
-      const state = getStone(stones, n);
-      if (state === color)
-        queue = queue.push(n);
-      else
-        surrounding = surrounding.set(n, state);
-    });
-
-    visited = visited.add(stone);
-    return search(visited, queue, surrounding);
+    return search(group, queue.shift(), visited.add(pos));
   };
 
-  const {visited, surrounding} = search(Immutable.Set(),
-                                        Immutable.List([coords]),
-                                        Immutable.Map());
-
-  return new Group({ stones       : visited,
-                     surrounding  : surrounding });
-};
-
-const createEmptyGrid = (() => {
-  const createGrid = (size) =>
-    Immutable.Repeat(
-      Immutable.Repeat(Constants.EMPTY, size).toList(),
-      size
-    ).toList();
-
-  const cache = {};
-  return (size) => cache[size] || (cache[size] = createGrid(size));
-})();
-
-class Board {
-  constructor(size, stones) {
-    if (typeof size === "undefined" || size < 0)
-      throw "Size must be an integer greater than zero";
-
-    if (typeof stones === "undefined")
-      stones = Immutable.Map();
-
-    this.size = size;
-    this.stones = stones;
-  }
-
-  getStone(coords) {
-    return getStone(this.stones, new Point(coords[0], coords[1]));
-  }
-
-  getSize() {
-    return this.size;
-  }
-
-  toArray() {
-    return this.getIntersections().toJS();
-  }
-
-  getIntersections() {
-    const mergeStones = map =>
-      this.stones.reduce(
-        (board, color, point) =>
-          board.setIn([point.i, point.j], color),
-        map);
-    return createEmptyGrid(this.size).withMutations(mergeStones);
-  }
-
-  play(color, coords) {
-    coords = new Point(coords[0], coords[1]);
-
-    if (!inBounds(this.size, coords))
-      throw "Intersection out of bounds";
-
-    if (getStone(this.stones, coords) != Constants.EMPTY)
-      throw "Intersection occupied by existing stone";
-
-    let newBoard = replaceStone(this.stones, coords, color);
-    const neighbors = getAdjacentIntersections(this.size, coords);
-    const neighborColors = Immutable.Map(
-      neighbors.zipWith(n => [n, getStone(newBoard, n)])
-    );
-    const isOpponentColor = (stoneColor, _) =>
-      stoneColor === opponentColor(color);
-    let captured = neighborColors.
-                     filter(isOpponentColor).
-                     map((val, coord) => getGroup(newBoard, this.size, coord)).
-                     valueSeq().
-                     filter(g => g.isDead());
-
-    // detect suicide
-    const newGroup = getGroup(newBoard, this.size, coords);
-    if (captured.isEmpty() && newGroup.isDead())
-      captured = Immutable.List([newGroup]);
-
-    newBoard = captured.
-                 flatMap(g => g.get("stones")).
-                 reduce((acc, stone) => removeStone(acc, stone), newBoard);
-
-    return createBoard(this.size, newBoard);
-  }
-
-  areaScore() {
-    const positions = allPositions(this.size);
-    let visited = Immutable.Set();
-    const score = {};
-    score[Constants.BLACK] = 0;
-    score[Constants.WHITE] = 0;
-
-    positions.forEach((coords) => {
-      if (visited.has(coords))
-        return;
-
-      const state = getStone(this.stones, coords);
-      const group = getGroup(this.stones, this.size, coords);
-      const groupStones = group.get("stones");
-      const surroundingColors = group.get("surrounding").valueSeq().toSet();
-
-      if (state === Constants.EMPTY && surroundingColors.size === 1)
-          score[surroundingColors.first()] += groupStones.size;
-      else
-        score[state] += groupStones.size;
-
-      visited = visited.union(groupStones);
-    });
-
-    return score;
-  }
-
+  return search(new Group(), new Immutable.List([position]), new Immutable.Set());
 }
 
-export const createBoard = (size, stones) =>
-  new Board(size, stones);
+
+export function createBoard(size) {
+  if (typeof size === 'undefined' || size < 0) {
+    throw new Error('Size must be an integer greater than zero');
+  }
+
+  return new Immutable.Map({
+    size,
+    stones: new Immutable.Map(),
+  });
+}
+
+export function placeStone(board, move, allowSuicide = false) {
+  const size = board.get('size');
+  const stones = board.get('stones');
+
+  if (!positionInBounds(size, move.get('position'))) {
+    throw new Error('Intersection out of bounds');
+  }
+
+  if (stones.has(move.get('position'))) {
+    throw new Error('Intersection occupied by existing stone');
+  }
+
+  const newBoard = stones.set(move.get('position'), move.get('stoneColor'));
+  const neighborCoords = getNeighbors(size, move.get('position'));
+  const neighboringEnemyStones =
+    neighborCoords.filter(p => stones.has(p) && stones.get(p) !== move.get('stoneColor'));
+  const neighboringEnemyGroups =
+    neighboringEnemyStones.map(p => groupAtPosition(size, newBoard, p));
+  const deadNeighborGroups = neighboringEnemyGroups.filter(g => g.get('liberties').size === 0);
+  const stonesAfterRemovals = deadNeighborGroups.reduce(removeGroup, newBoard);
+
+  const newGroup = groupAtPosition(size, stonesAfterRemovals, move.get('position'));
+
+  if (newGroup.get('liberties').size === 0) {
+    if (!allowSuicide) {
+      throw new Error('New group has zero liberies (suicide)');
+    } else {
+      return board.set('stones', removeGroup(stonesAfterRemovals, newGroup));
+    }
+  }
+
+  return board.set('stones', stonesAfterRemovals);
+}
+
+function allPositions(size) {
+  const range = new Immutable.Range(0, size);
+  return range.flatMap(i => range.map(j => new Position({ i, j })));
+}
+
+function surroundingColors(board, group) {
+  const result = { black: false, white: false };
+  const groupStones = group.get('stones');
+  groupStones.forEach((position) => {
+    const neighborCoords = getNeighbors(board.get('size'), position);
+    neighborCoords.forEach((pos) => {
+      if (groupStones.has(pos)) { return; }
+      const color = board.get('stones').get(pos);
+      if (typeof color !== 'undefined') {
+        result[color] = true;
+      }
+    });
+  });
+  return result;
+}
+
+export function areaScore(board) {
+  const size = board.get('size');
+  const positions = allPositions(size);
+  let visited = new Immutable.Set();
+  const score = { black: 0, white: 0 };
+
+  positions.forEach((position) => {
+    if (visited.has(position)) { return; }
+    const groupColor = board.get('stones').get(position);
+    const group = groupAtPosition(size, board.get('stones'), position);
+    const colors = surroundingColors(board, group);
+
+    if (typeof groupColor === 'undefined') {
+      if (colors.white && !colors.black) {
+        score.white += group.get('stones').size;
+      } else if (colors.black && !colors.white) {
+        score.black += group.get('stones').size;
+      }
+    } else {
+      score[groupColor] += group.get('stones').size;
+    }
+
+    visited = visited.union(group.get('stones'));
+  });
+  return score;
+}
+
+export function toArray(board) {
+  const size = board.get('size');
+
+  const boardArray = Array(size);
+  for (let i = 0; i < size; i += 1) {
+    const row = Array(size);
+    for (let j = 0; j < size; j += 1) {
+      row[j] = '.';
+    }
+    boardArray[i] = row;
+  }
+
+  const boardState = board.get('stones');
+  boardState.forEach((stoneColor, position) => {
+    const character = stoneColor === 'black' ? 'x' : 'o';
+    boardArray[position.get('i')][position.get('j')] = character;
+  });
+  return boardArray;
+}

@@ -38,14 +38,14 @@ game = Weiqi.createGame(19);  // creates a game on a 19 x 19 board
 
 ```javascript
 var Weiqi = require('weiqi');
-var game = Weiqi.createGame(9)
-                .play(Weiqi.BLACK, [2,2])
-                .play(Weiqi.WHITE, [6,7])
-                .pass(Weiqi.BLACK)  // black passes
-                .pass(Weiqi.WHITE); // white passes
+var game = Weiqi.createGame(9);
+game = Weiqi.play(game, 'black', [2,2]);
+game = Weiqi.play(game, 'white', [6,7]);
+game = Weiqi.pass(game, 'black'); // black passes
+game = Weiqi.pass(game, 'white'); // white passes
 ```
 
-`Game.play` and `Game.pass` each take a player identifier (`Weiqi.BLACK` or `Weiqi.WHITE`). `Game.play` takes an additional zero-indexed array of size two that indicates the position to place a stone. `Game.play` will raise exceptions for the following situations:
+`Weiqi.play` and `Weiqi.pass` each take a player identifier (`'black'` or `'white'`). `Weiqi.play` takes an additional zero-indexed array of size two that indicates the position to place a stone. `Weiqi.play` will raise exceptions for the following situations:
 * the game is already over (there have already been two consecutive passes)
 * it is not currently the turn of the player who is attempting to play
 * the move violates [positional superko][5] (at the end of any turn, the board cannot
@@ -55,13 +55,12 @@ be in a state in which it has been previously).
 
 ### Querying the game
 
-`getCurrentPlayer` returns either `Weiqi.BLACK` or `Weiqi.WHITE`. The example below shows that `Weiqi.WHITE === "o"`, but don't depend on that always being true. Always perform comparisons to `Weiqi.BLACK` and `Weiqi.WHITE`.
+`get('currentPlayer')` returns either `'black'` or `'white'`.
 
 ```javascript
 > var Weiqi = require('weiqi');
-> var game = Weiqi.createGame(9)
-                .play(Weiqi.BLACK, [2,2]);
-> game.getCurrentPlayer();
+> var game = Weiqi.play(Weiqi.createGame(9), 'black', [2,2]);
+> game.get('currentPlayer');
 "o"
 ```
 
@@ -69,48 +68,15 @@ be in a state in which it has been previously).
 
 ```javascript
 > var Weiqi = require('weiqi');
-> var game = Weiqi.createGame(9)
-                .play(Weiqi.BLACK, [2,2]);
-> game.isOver();
+> var game = Weiqi.play(Weiqi.createGame(9), 'black', [2,2]);
+> Weiqi.isOver(game);
 false
-> game = game.pass(Weiqi.WHITE);
-> game.isOver();
+> game = Weiqi.pass(game, 'white');
+> Weiqi.isOver(game);
 false
-> game = game.pass(Weiqi.BLACK);
-> game.isOver();
+> game = Weiqi.pass(game, 'black');
+> Weiqi.isOver(game);
 true
-```
-
-To see where all the stones are, use `game.getBoard().getIntersections()`. This returns an [`Immutable.List`][6] of [`Immutable.List`][6]s.
-
-[6]: http://facebook.github.io/immutable-js/docs/#/List
-
-```javascript
-> game.getBoard().getIntersections()
-List [ List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", "x", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", "o", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ],
-       List [ ".", ".", ".", ".", ".", ".", ".", ".", "." ] ]
-```
-
-Alternatively, you can retrieve the board state as a standard JavaScript Array.
-
-```javascript
-> game.getBoard().toArray()
-[ [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', 'x', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', 'o', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ],
-  [ '.', '.', '.', '.', '.', '.', '.', '.', '.' ] ]
 ```
 
 To compute the score of the game (using [area score][6]) pass a value of komi to `areaScore()`. All stones are considered alive.
@@ -118,5 +84,5 @@ To compute the score of the game (using [area score][6]) pass a value of komi to
 [6]: http://senseis.xmp.net/?Scoring
 
 ```javascript
-game.areaScore(7.5);  // compute area score given 7.5 komi
+Weiqi.areaScore(game, 7.5);  // compute area score given 7.5 komi
 ```
