@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "make test",
-    "build": "make"
+    "build": "make clean && make",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
